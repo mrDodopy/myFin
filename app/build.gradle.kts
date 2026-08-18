@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
@@ -9,14 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.myfin"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.example.myfin"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -69,15 +66,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.3")
 
     // Liquid glass
-    implementation("io.github.kyant0:backdrop:1.0.6")
+    implementation("io.github.kyant0:backdrop:2.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Liquid glass effect
-    implementation("io.github.kyant0:backdrop:2.0.0")
 }
 
 kotlin {
