@@ -28,7 +28,7 @@ import com.kyant.backdrop.effects.vibrancy
 fun GlassCard(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 24.dp,
-    alpha: Float = 0.5f,
+    alpha: Float = 0.3f,
     content: @Composable BoxScope.() -> Unit
 ) {
     val backgroundColor = Color.White
@@ -38,14 +38,22 @@ fun GlassCard(
     }
 
     Box(
-        modifier = modifier,
+        modifier = modifier.clip(RoundedCornerShape(cornerRadius)),
         contentAlignment = Alignment.Center
     ) {
         Box(
-            modifier = Modifier
+            Modifier
                 .matchParentSize()
-                .glassmorphism(cornerRadius = cornerRadius, alpha = alpha)
-                .blur(50.dp)
+                .drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { RoundedCornerShape(cornerRadius) },
+                    effects = {
+                        vibrancy()
+                        blur(4f.dp.toPx())
+                        lens(16f.dp.toPx(), 32f.dp.toPx())
+                    },
+                    onDrawSurface = { drawRect(Color.White.copy(alpha = alpha)) }
+                )
         )
 
         Box(
@@ -54,21 +62,4 @@ fun GlassCard(
             content()
         }
     }
-//
-//        Box(
-//            Modifier
-//                .safeContentPadding()
-//                .drawBackdrop(
-//                    backdrop = backdrop,
-//                    shape = { CircleShape },
-//                    effects = {
-//                        vibrancy()
-//                        blur(4f.dp.toPx())
-//                        lens(16f.dp.toPx(), 32f.dp.toPx())
-//                    },
-//                    onDrawSurface = { drawRect(Color.White.copy(alpha = 0.5f)) }
-//                )
-//                .height(64f.dp)
-//                .fillMaxWidth()
-//        )
 }

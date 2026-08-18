@@ -28,6 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.myfin.screens.DashBoardScreen
+import com.example.myfin.screens.DebtsScreen
+import com.example.myfin.screens.HistoryScreen
+import com.example.myfin.screens.SettingsScreen
 import com.example.myfin.ui.theme.MyFinTheme
 import com.example.myfin.utils.DialogController
 import com.example.myfin.utils.HelpWithDialog
@@ -47,9 +51,6 @@ class MainActivity : ComponentActivity() {
                         // Основное приложение
                         AppContent()
 
-                        // ==========================================
-                        // ОВЕРЛЕЙ, АНИМАЦИИ И МЕСТО ДЛЯ LIQUID GLASS
-                        // ==========================================
                         AnimatedVisibility(
                             visible = dialogController.isVisible,
                             enter = fadeIn(),
@@ -98,28 +99,37 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppContent() {
-    val numberOfPagesState = rememberPagerState(pageCount = { 4 })
+    val numberOfPagesState = rememberPagerState(pageCount = { 5 })
 
     HorizontalPager(
         state = numberOfPagesState,
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.Top
     ) { pageNumber ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(randomizedBackgroundColor().copy(0.5f))
-                .statusBarsPadding()
-        ) {
-            Button(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .fillMaxWidth(),
-                onClick = {}
-            ) {
-                Text(text = "example of text")
+
+        when(pageNumber){
+            0 -> DashBoardScreen()
+            1 -> HistoryScreen()
+            2 -> DebtsScreen()
+            3 -> SettingsScreen()
+            4 -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(randomizedBackgroundColor().copy(0.5f))
+                        .statusBarsPadding()
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth(),
+                        onClick = {}
+                    ) {
+                        Text(text = "example of text")
+                    }
+                    HelpWithDialog(pageNumber)
+                }
             }
-            HelpWithDialog(pageNumber)
         }
     }
 }
