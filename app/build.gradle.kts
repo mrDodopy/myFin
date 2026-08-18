@@ -75,6 +75,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Liquid glass effect
+    implementation("io.github.kyant0:backdrop:2.0.0")
 }
 
 kotlin {
