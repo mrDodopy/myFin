@@ -11,39 +11,44 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myfin.screens.DashBoardScreen
 import com.example.myfin.screens.DebtsScreen
 import com.example.myfin.screens.HistoryScreen
 import com.example.myfin.screens.SettingsScreen
+import com.example.myfin.screens.components.BottomNavItem
 import com.example.myfin.screens.components.CustomBottomBar
+import com.example.myfin.screens.components.CustomBottomTab
+import com.example.myfin.screens.components.LiquidButton
 import com.example.myfin.screens.components.LiveBackground
 import com.example.myfin.ui.theme.MyFinTheme
 import com.example.myfin.utils.DialogController
-import com.example.myfin.utils.HelpWithDialog
 import com.example.myfin.utils.LocalDialogController
-import com.example.myfin.utils.randomizedBackgroundColor
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyFinTheme {
+                val backdrop = rememberLayerBackdrop()
+
                 val dialogController = remember { DialogController() }
                 val isButtonVisible = remember { mutableStateOf(true) }
-                val coroutineScope = rememberCoroutineScope()
 
                 CompositionLocalProvider(LocalDialogController provides dialogController) {
                     val blurRadius by animateDpAsState(
@@ -52,9 +57,9 @@ class MainActivity : ComponentActivity() {
                     )
 
                     Box(modifier = Modifier.fillMaxSize()) {
-                        val numberOfPagesState = rememberPagerState(pageCount = { 5 })
+                        // Меняем количество страниц на 4 (под наши 4 вкладки)
+                        val selectedPageState = rememberPagerState(pageCount = { 4 })
 
-                        // Задний фон
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -62,7 +67,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             LiveBackground()
                             HorizontalPager(
-                                state = numberOfPagesState,
+                                state = selectedPageState,
                                 modifier = Modifier.fillMaxSize(),
                                 verticalAlignment = Alignment.Top
                             ) { pageNumber ->
@@ -71,97 +76,99 @@ class MainActivity : ComponentActivity() {
                                     1 -> HistoryScreen()
                                     2 -> DebtsScreen()
                                     3 -> SettingsScreen()
-                                    4 -> {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .background(randomizedBackgroundColor().copy(0.5f))
-                                                .statusBarsPadding()
-                                        ) {
-                                            Button(
-                                                modifier = Modifier
-                                                    .padding(horizontal = 20.dp)
-                                                    .fillMaxWidth(),
-                                                onClick = {}
-                                            ) {
-                                                Text(text = "example of text")
-                                            }
-                                            HelpWithDialog(pageNumber)
-                                        }
-                                    }
                                 }
                             }
 
-                            //TODO: Допилить анимацию
+                            // Плавно скрываем/показываем FAB (кнопку +).
+                            // Она пропадет на 3 странице (Настройки)
+                            val isFabVisible =
+                                isButtonVisible.value && selectedPageState.currentPage in 0..2
+
                             AnimatedVisibility(
                                 modifier = Modifier
-                                    .align(Alignment.BottomEnd),
-                                visible = isButtonVisible.value,
-                                enter = fadeIn(),
-                                exit = fadeOut()
+                                    .align(Alignment.BottomEnd)
+                                    .padding(bottom = 100.dp, end = 20.dp),
+                                visible = isFabVisible,
+                                enter = scaleIn() + fadeIn(),
+                                exit = scaleOut() + fadeOut()
                             ) {
-                                // Плавающая кнопка (+) поверх пейджера (скрываем на настройках)
-                                if (numberOfPagesState.currentPage in 0..2) {
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.BottomEnd)
-                                            .padding(
-                                                bottom = 100.dp,
-                                                end = 20.dp
-                                            ) // Чуть выше BottomBar
-                                            .size(56.dp)
-                                            .clip(CircleShape)
-                                            .background(Color(0xFF5E5CE6)) // Фиолетовый акцент
-                                            .clickable { /* TODO: Действие FAB */ },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Add,
-                                            contentDescription = "Add",
-                                            tint = Color.White
-                                        )
-                                    }
+                                LiquidButton(
+                                    onClick = {},
+                                    backdrop = backdrop,
+                                    surfaceColor = Color(0xFF5E5CE6).copy(0.5f),
+                                    modifier = Modifier
+                                        .size(56.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = "Add",
+                                        tint = Color.White
+                                    )
                                 }
+
+
                             }
 
                             // Кастомный Bottom Bar
+                            val bottomNavItems = remember {
+                                listOf(
+                                    BottomNavItem("Главная", Icons.Default.Home),
+                                    BottomNavItem("История", Icons.Default.List),
+                                    BottomNavItem("Долги", Icons.Default.Person),
+                                    BottomNavItem("Настройки", Icons.Default.Settings)
+                                )
+                            }
+
                             CustomBottomBar(
-                                modifier = Modifier.align(Alignment.BottomCenter),
-                                numberOfPagesState = numberOfPagesState
-                            )
+                                selectedPageState = selectedPageState,
+                                tabsCount = bottomNavItems.size,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth(0.8f)
+                                    .padding(bottom = 25.dp),
+                            ) {
+                                bottomNavItems.forEachIndexed { index, item ->
+                                    CustomBottomTab(
+                                        index = index,
+                                        title = item.title,
+                                        icon = item.icon
+                                    )
+                                }
+                            }
                         }
 
-                        // Логика диалогов (осталась без изменений)
-                        AnimatedVisibility(
-                            visible = dialogController.isVisible,
-                            enter = fadeIn(),
-                            exit = fadeOut()
+                    }
+
+                    // Логика диалогов
+                    AnimatedVisibility(
+                        visible = dialogController.isVisible,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.4f))
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {},
+                            contentAlignment = Alignment.Center
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.4f))
-                                    .clickable(
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null
-                                    ) {},
-                                contentAlignment = Alignment.Center
+                                modifier = Modifier.animateEnterExit(
+                                    enter = scaleIn(initialScale = 0.8f),
+                                    exit = scaleOut(targetScale = 0.8f)
+                                )
                             ) {
                                 Box(
-                                    modifier = Modifier.animateEnterExit(
-                                        enter = scaleIn(initialScale = 0.8f),
-                                        exit = scaleOut(targetScale = 0.8f)
+                                    modifier = Modifier.clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null,
+                                        onClick = {}
                                     )
                                 ) {
-                                    Box(
-                                        modifier = Modifier.clickable(
-                                            interactionSource = remember { MutableInteractionSource() },
-                                            indication = null,
-                                            onClick = {}
-                                        )
-                                    ) {
-                                        dialogController.dialogContent?.invoke()
-                                    }
+                                    dialogController.dialogContent?.invoke()
                                 }
                             }
                         }

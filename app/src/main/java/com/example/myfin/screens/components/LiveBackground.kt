@@ -98,7 +98,7 @@ fun LiveBackground(
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            Color(0xFF6B3FA0).copy(alpha = 0.42f),
+                            Color(0xFF6B3FA0).copy(alpha = 0.63f),
                             Color.Transparent
                         ),
                         center = Offset(purpleX, purpleY),
@@ -114,7 +114,7 @@ fun LiveBackground(
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            Color(0xFF316DA0).copy(alpha = 0.36f),
+                            Color(0xFF316DA0).copy(alpha = 0.54f),
                             Color.Transparent
                         ),
                         center = Offset(blueX, blueY),
@@ -130,7 +130,7 @@ fun LiveBackground(
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            Color(0xFF82464C).copy(alpha = 0.24f),
+                            Color(0xFF82464C).copy(alpha = 0.36f),
                             Color.Transparent
                         ),
                         center = Offset(warmX, warmY),
