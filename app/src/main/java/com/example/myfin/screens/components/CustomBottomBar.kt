@@ -210,9 +210,13 @@ fun CustomBottomBar(
                     backdrop = mainBackdrop,
                     shape = { RoundedCornerShape(percent = 50) },
                     effects = {
+                        val progress = dampedDragAnimation.pressProgress
                         vibrancy()
                         blur(8f.dp.toPx())
-                        lens(24f.dp.toPx(), 24f.dp.toPx())
+                        lens(
+                            24f.dp.toPx() * progress,
+                            24f.dp.toPx() * progress
+                        )
                     },
                     layerBlock = {
                         val progress = dampedDragAnimation.pressProgress

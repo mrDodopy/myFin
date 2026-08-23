@@ -35,7 +35,6 @@ fun GlassCard(
             .clip(shape),
         contentAlignment = Alignment.Center
     ) {
-
         // Основное стекло
         Box(
             modifier = Modifier
@@ -44,37 +43,20 @@ fun GlassCard(
                     backdrop = backdrop,
                     shape = { shape },
                     effects = {
-                        // Очень лёгкое усиление цветов
                         vibrancy()
-
-                        // Небольшое размытие
-                        blur(3.dp.toPx())
-
-                        // Основной эффект Liquid Glass
+                        blur(5.dp.toPx())
                         lens(
-                            34.dp.toPx(),
-                            52.dp.toPx()
+                            16.dp.toPx(),
+                            32.dp.toPx()
                         )
                     },
                     onDrawSurface = {
-                        // Очень лёгкий тёмный tint
                         drawRect(
                             Color.Black.copy(alpha = alpha)
                         )
                     }
                 )
         )
-
-        // Едва заметная дополнительная прозрачная плёнка
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(
-                    Color.Black.copy(alpha = 0.04f)
-                )
-        )
-
-        // Контент
         Box(
             modifier = Modifier.clip(shape)
         ) {
