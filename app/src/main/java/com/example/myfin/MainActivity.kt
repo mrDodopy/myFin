@@ -17,7 +17,9 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,7 @@ import com.example.myfin.screens.SettingsScreen
 import com.example.myfin.screens.components.BottomNavItem
 import com.example.myfin.screens.components.CustomBottomBar
 import com.example.myfin.screens.components.CustomBottomTab
+import com.example.myfin.screens.components.GlassCard
 import com.example.myfin.screens.components.LiquidButton
 import com.example.myfin.screens.components.LiveBackground
 import com.example.myfin.ui.theme.MyFinTheme
@@ -93,7 +96,22 @@ class MainActivity : ComponentActivity() {
                                 exit = scaleOut() + fadeOut()
                             ) {
                                 LiquidButton(
-                                    onClick = {},
+                                    onClick = {
+                                        dialogController.show {
+                                            GlassCard {
+                                                Column(modifier = Modifier.padding(24.dp)) {
+                                                    Text("Dialog on page ")
+                                                    Spacer(modifier = Modifier.height(100.dp))
+                                                    Button(
+                                                        onClick = { dialogController.hide() },
+                                                        modifier = Modifier.padding(top = 16.dp)
+                                                    ) {
+                                                        Text("Close dialog")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
                                     backdrop = backdrop,
                                     surfaceColor = Color(0xFF5E5CE6).copy(0.5f),
                                     modifier = Modifier

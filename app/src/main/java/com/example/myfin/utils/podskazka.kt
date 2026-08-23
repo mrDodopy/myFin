@@ -15,28 +15,21 @@ import com.example.myfin.screens.components.GlassCard
  * Экран для теста новых средств
  */
 @Composable
-fun HelpWithDialog(pageNumber: Int) {
+fun CustomDialogWindow() {
     val dialogController = LocalDialogController.current
 
-    Button(
-        onClick = {
-            dialogController.show {
-
-                GlassCard {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text("Dialog on page ${pageNumber + 1}")
-                        Spacer(modifier = Modifier.height(100.dp))
-                        Button(
-                            onClick = { dialogController.hide() },
-                            modifier = Modifier.padding(top = 16.dp)
-                        ) {
-                            Text("Close dialog")
-                        }
-                    }
+    dialogController.show {
+        GlassCard {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Text("Dialog on page ")
+                Spacer(modifier = Modifier.height(100.dp))
+                Button(
+                    onClick = { dialogController.hide() },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text("Close dialog")
                 }
             }
         }
-    ) {
-        Text("Page ${pageNumber + 1}")
     }
 }
