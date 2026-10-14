@@ -1,26 +1,18 @@
-package com.example.myfin.screens.components
+package com.example.myfin.navigation.screens.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -36,23 +28,21 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.lerp
 import com.example.myfin.utils.DampedDragAnimation
 import com.example.myfin.utils.InteractiveHighlight
+import com.kyant.backdrop.Backdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberCombinedBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
@@ -78,16 +68,16 @@ val LocalOnTabClick = compositionLocalOf<(Int) -> Unit> { {} }
 fun CustomBottomBar(
     selectedPageState: PagerState,
     tabsCount: Int,
+    backdrop: Backdrop,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
     val isLightTheme = !isSystemInDarkTheme()
-    val containerColor = if (isLightTheme) Color(0xFFFAFAFA).copy(0.4f) else Color(0xFF121212).copy(0.4f)
+    val accentColor = Color(0xFF5E5CE6)
+    val containerColor =
+        if (isLightTheme) Color(0xFFFAFAFA).copy(0.4f)
+        else Color(0xFF121212).copy(0.4f)
 
-    val mainBackdrop = rememberLayerBackdrop {
-        drawRect(Color.Transparent)
-        drawContent()
-    }
     val tabsBackdrop = rememberLayerBackdrop()
 
     BoxWithConstraints(
@@ -207,15 +197,15 @@ fun CustomBottomBar(
             Modifier
                 .graphicsLayer { translationX = panelOffset }
                 .drawBackdrop(
-                    backdrop = mainBackdrop,
+                    backdrop = backdrop,
                     shape = { RoundedCornerShape(percent = 50) },
                     effects = {
                         val progress = dampedDragAnimation.pressProgress
                         vibrancy()
                         blur(8f.dp.toPx())
                         lens(
-                            24f.dp.toPx() * progress,
-                            24f.dp.toPx() * progress
+                            24f.dp.toPx(),
+                            24f.dp.toPx()
                         )
                     },
                     layerBlock = {
@@ -234,52 +224,56 @@ fun CustomBottomBar(
         ) {
             CompositionLocalProvider(
                 LocalIsColoredLayer provides false,
-                LocalBottomTabDragValue provides { dampedDragAnimation.value }, // Передаем как лямбду
-                LocalBottomTabPressProgress provides { dampedDragAnimation.pressProgress }, // Передаем как лямбду
+                LocalBottomTabDragValue provides { dampedDragAnimation.value },
+                LocalBottomTabPressProgress provides { dampedDragAnimation.pressProgress },
                 LocalOnTabClick provides onTabClick
             ) {
-                content()
+                this.content()
             }
         }
 
-        // --- СЛОЙ 2: Цветные активные вкладки ---
-        Row(
-            Modifier
-                .clearAndSetSemantics {}
-                .alpha(0f)
-                .layerBackdrop(tabsBackdrop)
-                .graphicsLayer { translationX = panelOffset }
-                .drawBackdrop(
-                    backdrop = mainBackdrop,
-                    shape = { RoundedCornerShape(percent = 50) },
-                    effects = {
-                        val progress = dampedDragAnimation.pressProgress
-                        vibrancy()
-                        blur(8f.dp.toPx())
-                        lens(
-                            24f.dp.toPx() * progress,
-                            24f.dp.toPx() * progress
-                        )
-                    },
-                    highlight = {
-                        val progress = dampedDragAnimation.pressProgress
-                        Highlight.Default.copy(alpha = progress)
-                    },
-                    onDrawSurface = { drawRect(containerColor) }
-                )
-                .then(interactiveHighlight.modifier)
-                .height(56f.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 4f.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // --- СЛОЙ 2: Цветной слой активной вкладки ---
+        CompositionLocalProvider(
+            LocalLiquidBottomTabScale provides {
+                lerp(1f, 1.2f, dampedDragAnimation.pressProgress)
+            },
+            LocalIsColoredLayer provides true,
+            LocalBottomTabDragValue provides { dampedDragAnimation.value },
+            LocalBottomTabPressProgress provides { dampedDragAnimation.pressProgress },
+            LocalOnTabClick provides onTabClick
         ) {
-            CompositionLocalProvider(
-                LocalIsColoredLayer provides true,
-                LocalBottomTabDragValue provides { dampedDragAnimation.value }, // Передаем как лямбду
-                LocalBottomTabPressProgress provides { dampedDragAnimation.pressProgress }, // Передаем как лямбду
-                LocalOnTabClick provides onTabClick
+            Row(
+                Modifier
+                    .clearAndSetSemantics {}
+                    .alpha(0f)
+                    .layerBackdrop(tabsBackdrop)
+                    .graphicsLayer { translationX = panelOffset }
+                    .drawBackdrop(
+                        backdrop = backdrop,
+                        shape = { RoundedCornerShape(percent = 50) },
+                        effects = {
+                            val progress = dampedDragAnimation.pressProgress
+                            vibrancy()
+                            blur(8f.dp.toPx())
+                            lens(
+                                24f.dp.toPx() * progress,
+                                24f.dp.toPx() * progress
+                            )
+                        },
+                        highlight = {
+                            val progress = dampedDragAnimation.pressProgress
+                            Highlight.Default.copy(alpha = progress)
+                        },
+                        onDrawSurface = { drawRect(containerColor) }
+                    )
+                    .then(interactiveHighlight.modifier)
+                    .height(56f.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 4f.dp)
+                    .graphicsLayer(colorFilter = ColorFilter.tint(accentColor)),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                content()
+                this.content()
             }
         }
 
@@ -295,7 +289,7 @@ fun CustomBottomBar(
                 .then(interactiveHighlight.gestureModifier)
                 .then(dampedDragAnimation.modifier)
                 .drawBackdrop(
-                    backdrop = rememberCombinedBackdrop(mainBackdrop, tabsBackdrop),
+                    backdrop = rememberCombinedBackdrop(backdrop, tabsBackdrop),
                     shape = { RoundedCornerShape(percent = 50) },
                     effects = {
                         val progress = dampedDragAnimation.pressProgress

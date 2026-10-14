@@ -26,20 +26,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.myfin.screens.DashBoardScreen
-import com.example.myfin.screens.DebtsScreen
-import com.example.myfin.screens.HistoryScreen
-import com.example.myfin.screens.SettingsScreen
-import com.example.myfin.screens.components.BottomNavItem
-import com.example.myfin.screens.components.CustomBottomBar
-import com.example.myfin.screens.components.CustomBottomTab
-import com.example.myfin.screens.components.GlassCard
-import com.example.myfin.screens.components.LiquidButton
-import com.example.myfin.screens.components.LiveBackground
+import com.example.myfin.navigation.screens.DashBoardScreen
+import com.example.myfin.navigation.screens.DebtsScreen
+import com.example.myfin.navigation.screens.HistoryScreen
+import com.example.myfin.navigation.screens.SettingsScreen
+import com.example.myfin.navigation.screens.components.BottomNavItem
+import com.example.myfin.navigation.screens.components.CustomBottomBar
+import com.example.myfin.navigation.screens.components.CustomBottomTab
+import com.example.myfin.navigation.screens.components.GlassCard
+import com.example.myfin.navigation.screens.components.LiquidButton
+import com.example.myfin.navigation.screens.components.LiveBackground
 import com.example.myfin.ui.theme.MyFinTheme
 import com.example.myfin.utils.DialogController
 import com.example.myfin.utils.LocalDialogController
-import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 
 
@@ -140,6 +139,7 @@ class MainActivity : ComponentActivity() {
                             CustomBottomBar(
                                 selectedPageState = selectedPageState,
                                 tabsCount = bottomNavItems.size,
+                                backdrop = backdrop,
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
                                     .fillMaxWidth(0.8f)

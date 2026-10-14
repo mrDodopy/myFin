@@ -1,4 +1,4 @@
-package com.example.myfin.screens
+package com.example.myfin.navigation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myfin.screens.components.GlassCard
+import com.example.myfin.navigation.screens.components.GlassCard
 import com.example.myfin.utils.LocalDialogController
 
 @OptIn(ExperimentalLayoutApi::class)

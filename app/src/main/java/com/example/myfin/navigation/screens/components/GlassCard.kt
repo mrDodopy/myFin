@@ -1,4 +1,4 @@
-package com.example.myfin.screens.components
+package com.example.myfin.navigation.screens.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,8 @@ fun GlassCard(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 30.dp,
     alpha: Float = 0.16f,
+    // Можно регулировать интенсивность белой подложки
+    underlayAlpha: Float = 0.12f,
     content: @Composable BoxScope.() -> Unit
 ) {
     val shape = RoundedCornerShape(cornerRadius)
@@ -35,7 +37,17 @@ fun GlassCard(
             .clip(shape),
         contentAlignment = Alignment.Center
     ) {
-        // Основное стекло
+        // 1. Мягкая белая подложка (самый нижний слой)
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    color = Color.White.copy(alpha = underlayAlpha),
+                    shape = shape
+                )
+        )
+
+        // 2. Стекло
         Box(
             modifier = Modifier
                 .matchParentSize()
@@ -44,7 +56,7 @@ fun GlassCard(
                     shape = { shape },
                     effects = {
                         vibrancy()
-                        blur(5.dp.toPx())
+                        blur(15.dp.toPx())
                         lens(
                             16.dp.toPx(),
                             32.dp.toPx()
@@ -57,6 +69,8 @@ fun GlassCard(
                     }
                 )
         )
+
+        // 3. Контент
         Box(
             modifier = Modifier.clip(shape)
         ) {

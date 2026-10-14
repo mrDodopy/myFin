@@ -1,4 +1,4 @@
-package com.example.myfin.screens
+package com.example.myfin.navigation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myfin.screens.components.GlassCard
+import com.example.myfin.navigation.screens.components.GlassCard
 
 @Composable
 fun DebtsScreen() {

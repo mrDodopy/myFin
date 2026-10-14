@@ -1,4 +1,4 @@
-package com.example.myfin.screens.components
+package com.example.myfin.navigation.screens.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode

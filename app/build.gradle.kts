@@ -4,6 +4,9 @@ plugins {
 
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
+
 }
 
 android {
@@ -74,6 +77,18 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
+
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+
+
+
 
 }
 

@@ -6,10 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.myfin.navigation.sealedScreens.SealedButtonBar
-import com.example.myfin.screens.DashBoardScreen
-import com.example.myfin.screens.DebtsScreen
-import com.example.myfin.screens.HistoryScreen
-import com.example.myfin.screens.SettingsScreen
+import com.example.myfin.navigation.screens.DashBoardScreen
+import com.example.myfin.navigation.screens.DebtsScreen
+import com.example.myfin.navigation.screens.HistoryScreen
+import com.example.myfin.navigation.screens.SettingsScreen
 
 @Composable
 fun NavGraph(
