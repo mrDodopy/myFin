@@ -26,6 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myfin.data.AppDatabase
+import com.example.myfin.data.MainViewModel
+import com.example.myfin.data.MainViewModelFactory
+import com.example.myfin.data.repositoryes.CategoryRepository
+import com.example.myfin.data.repositoryes.UserPreferencesRepository
 import com.example.myfin.navigation.screens.DashBoardScreen
 import com.example.myfin.navigation.screens.DebtsScreen
 import com.example.myfin.navigation.screens.HistoryScreen
@@ -48,8 +54,38 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val userPreferencesRepository =
+            UserPreferencesRepository(applicationContext)
+
+        val database =
+            AppDatabase.getInstance(applicationContext)
+
+        val categoryRepository =
+            CategoryRepository(database.categoryDao())
+
         setContent {
-            MyFinTheme {
+
+            val mainViewModel: MainViewModel = viewModel(
+                factory = MainViewModelFactory(
+                    userPreferencesRepository = userPreferencesRepository,
+                    categoryRepository = categoryRepository
+                )
+            )
+
+            val userSettings by mainViewModel.userSettings.collectAsState()
+
+            MyFinTheme(
+                darkTheme = userSettings.themeMode == "dark"
+            ) {
+
+                /**
+                 * val mainViewModel: MainViewModel = viewModel(
+                 *                     factory = MainViewModelFactory(
+                 *                         userPreferencesRepository = userPreferencesRepository,
+                 *                         categoryRepository = categoryRepository
+                 *                     )
+                 *                 )
+                 */
 
                 /*
                  * ============================================================
@@ -130,7 +166,6 @@ class MainActivity : ComponentActivity() {
                                 .layerBackdrop(backdrop)
                                 .blur(blurRadius)
                         ) {
-
                             LiveBackground()
 
                             HorizontalPager(
@@ -139,17 +174,16 @@ class MainActivity : ComponentActivity() {
                             ) { page ->
 
                                 when (page) {
-                                    0 -> DashBoardScreen()
+                                    0 -> DashBoardScreen(mainViewModel)
 
-                                    1 -> HistoryScreen()
+                                    1 -> HistoryScreen(mainViewModel)
 
-                                    2 -> DebtsScreen()
+                                    2 -> DebtsScreen(mainViewModel)
 
-                                    3 -> SettingsScreen()
+                                    3 -> SettingsScreen(mainViewModel)
                                 }
                             }
                         }
-
 
                         /*
                          * ====================================================
@@ -176,14 +210,10 @@ class MainActivity : ComponentActivity() {
                             enter = scaleIn() + fadeIn(),
                             exit = scaleOut() + fadeOut()
                         ) {
-
                             LiquidButton(
                                 onClick = {
-
                                     dialogController.show {
-
                                         GlassCard {
-
                                             Column(
                                                 modifier = Modifier.padding(24.dp)
                                             ) {
@@ -211,15 +241,12 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
                                 },
-
                                 backdrop = backdrop,
-
                                 surfaceColor = Color(
                                     0xFF5E5CE6
                                 ).copy(
                                     alpha = 0.5f
                                 ),
-
                                 modifier = Modifier.size(56.dp)
                             ) {
 
@@ -245,9 +272,7 @@ class MainActivity : ComponentActivity() {
                          * ====================================================
                          */
                         val bottomNavItems = remember {
-
                             listOf(
-
                                 BottomNavItem(
                                     "Главная",
                                     Icons.Default.Home
@@ -274,16 +299,13 @@ class MainActivity : ComponentActivity() {
                             selectedPageState = selectedPageState,
                             tabsCount = bottomNavItems.size,
                             backdrop = backdrop,
-
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .fillMaxWidth(0.8f)
                                 .padding(bottom = 25.dp)
 
                         ) {
-
                             bottomNavItems.forEachIndexed { index, item ->
-
                                 CustomBottomTab(
                                     index = index,
                                     title = item.title,
@@ -307,9 +329,7 @@ class MainActivity : ComponentActivity() {
                          */
                         AnimatedVisibility(
                             visible = dialogController.isVisible,
-
                             enter = fadeIn(),
-
                             exit = fadeOut()
                         ) {
 
@@ -327,10 +347,8 @@ class MainActivity : ComponentActivity() {
                                         },
                                         indication = null
                                     ) {},
-
                                 contentAlignment = Alignment.Center
                             ) {
-
                                 Box(
                                     modifier = Modifier.animateEnterExit(
                                         enter = scaleIn(
@@ -341,7 +359,6 @@ class MainActivity : ComponentActivity() {
                                         )
                                     )
                                 ) {
-
                                     Box(
                                         modifier = Modifier.clickable(
                                             interactionSource = remember {
@@ -351,7 +368,6 @@ class MainActivity : ComponentActivity() {
                                             onClick = {}
                                         )
                                     ) {
-
                                         dialogController.dialogContent?.invoke()
                                     }
                                 }

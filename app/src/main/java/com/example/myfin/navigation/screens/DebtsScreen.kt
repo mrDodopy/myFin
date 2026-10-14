@@ -9,15 +9,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myfin.data.MainViewModel
 import com.example.myfin.navigation.screens.components.GlassCard
 
 @Composable
-fun DebtsScreen() {
+fun DebtsScreen(
+    viewModel: MainViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
-            .padding(horizontal = 5.dp),
+            .padding(horizontal = 10.dp),
     ) {
         Spacer(modifier = Modifier.statusBarsPadding())
         Text("Обязательства", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)

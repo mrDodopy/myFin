@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.hilt.android)
 
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
-
 }
 
 android {
@@ -87,9 +86,10 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
-
-
-
+    // Room
+    implementation("androidx.room:room-runtime:2.8.3")
+    implementation("androidx.room:room-ktx:2.8.3")
+    ksp("androidx.room:room-compiler:2.8.3")
 }
 
 kotlin {

@@ -21,17 +21,17 @@ fun NavGraph(
         startDestination = SealedButtonBar.Main.route,
         modifier = modifier
     ) {
-        composable(SealedButtonBar.Main.route) {
-            DashBoardScreen()
-        }
-        composable(SealedButtonBar.Operations.route) {
-            HistoryScreen()
-        }
-        composable(SealedButtonBar.Budget.route) {
-            DebtsScreen()
-        }
-        composable(SealedButtonBar.Settings.route) {
-            SettingsScreen()
-        }
+//        composable(SealedButtonBar.Main.route) {
+//            DashBoardScreen()
+//        }
+//        composable(SealedButtonBar.Operations.route) {
+//            HistoryScreen()
+//        }
+//        composable(SealedButtonBar.Budget.route) {
+//            DebtsScreen()
+//        }
+//        composable(SealedButtonBar.Settings.route) {
+//            SettingsScreen()
+//        }
     }
 }

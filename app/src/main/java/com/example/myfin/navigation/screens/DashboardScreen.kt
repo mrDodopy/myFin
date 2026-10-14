@@ -11,18 +11,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myfin.data.MainViewModel
 import com.example.myfin.navigation.screens.components.GlassCard
 
 @Composable
-fun DashBoardScreen() {
+fun DashBoardScreen(
+    viewModel: MainViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 5.dp),
+            .padding(horizontal = 0.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Spacer(modifier = Modifier.statusBarsPadding())
@@ -38,6 +42,7 @@ fun DashBoardScreen() {
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Spacer(modifier = Modifier.width(5.dp))
             GlassCard(modifier = Modifier.width(240.dp).height(120.dp)) { /* Контент карты 1 */ }
             Spacer(modifier = Modifier.width(10.dp))
             GlassCard(modifier = Modifier.width(240.dp).height(120.dp)) { /* Контент карты 2 */ }
@@ -45,21 +50,32 @@ fun DashBoardScreen() {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Аналитика", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        GlassCard(modifier = Modifier.fillMaxWidth().height(200.dp)) {
-            // Место под график
+        // Блок аналитики
+        Column (
+            modifier = Modifier.wrapContentSize(align = Alignment.CenterStart).padding(horizontal = 10.dp)
+        ) {
+            Text("Аналитика", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            GlassCard(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+                // Место под график
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Последние операции", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(10.dp))
+        // Блок последних операций
+        Column (
+            modifier = Modifier.wrapContentSize(align = Alignment.CenterStart).padding(horizontal = 10.dp),
+        ){
+            Text("Последние операции", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(10.dp))
 
-        repeat(5) {
-            GlassCard(modifier = Modifier.fillMaxWidth().height(60.dp).padding(bottom = 10.dp)) {
-                // Строка операции: иконка, название, сумма
+            repeat(5) {
+                GlassCard(modifier = Modifier.fillMaxWidth().height(60.dp).padding(bottom = 10.dp)) {
+                    // Строка операции: иконка, название, сумма
+                }
             }
         }
+
 
         Spacer(modifier = Modifier.height(100.dp)) // Отступ под BottomBar
     }
