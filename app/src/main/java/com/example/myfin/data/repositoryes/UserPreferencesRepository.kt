@@ -25,7 +25,6 @@ class UserPreferencesRepository(
 
     object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
-        val AUTH_TOKEN = stringPreferencesKey("auth_token")
 
 
         // В будущем:
@@ -45,8 +44,7 @@ class UserPreferencesRepository(
     val userSettingsFlow: Flow<UserSettings> =
         rootPreferencesFlow.map { preferences ->
             UserSettings(
-                themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "system",
-                authToken = preferences[PreferencesKeys.AUTH_TOKEN]
+                themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "system"
             )
         }
 

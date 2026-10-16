@@ -1,17 +1,23 @@
 package com.example.myfin.data
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myfin.data.repositoryes.AccountRepository
 import com.example.myfin.data.repositoryes.UserPreferencesRepository.PreferencesKeys
 import com.example.myfin.data.repositoryes.CategoryRepository
 import com.example.myfin.data.repositoryes.UserPreferencesRepository
+import com.example.myfin.utils.converseIconToIconName
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val categoryRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val accountRepository: AccountRepository
 ) : ViewModel() {
 
     val userSettings = userPreferencesRepository.userSettingsFlow
@@ -20,7 +26,6 @@ class MainViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = UserSettings(
                 themeMode = "system",
-                authToken = null
             )
         )
 
@@ -46,25 +51,18 @@ class MainViewModel(
         }
     }
 
-    fun login(token: String) {
+    fun createNewCategory(
+        name: String,
+        color: Color,
+        icon: ImageVector
+        ){
         viewModelScope.launch {
-            userPreferencesRepository.update { preferences ->
-                preferences[PreferencesKeys.AUTH_TOKEN] = token
-
-                // В будущем сюда можно добавить:
-                // preferences[PreferencesKeys.USER_NAME] = name
-            }
+            categoryRepository.addCategory(
+                name = name,
+                color = color.toArgb(),
+                icon = converseIconToIconName(icon)
+            )
         }
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            userPreferencesRepository.update { preferences ->
-                preferences.remove(PreferencesKeys.AUTH_TOKEN)
-
-                // В будущем:
-                // preferences.remove(PreferencesKeys.USER_NAME)
-            }
-        }
-    }
 }

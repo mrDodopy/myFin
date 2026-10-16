@@ -1,17 +1,21 @@
 package com.example.myfin.navigation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,6 +23,7 @@ import com.example.myfin.data.MainViewModel
 import com.example.myfin.navigation.screens.components.GlassCard
 import com.example.myfin.navigation.screens.components.forSettingsScreen.*
 import com.example.myfin.utils.LocalDialogController
+import com.example.myfin.utils.converseNameIconToIcon
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -33,6 +38,8 @@ fun SettingsScreen(
     var pinEnabled by remember { mutableStateOf(true) }
     var biometricsEnabled by remember { mutableStateOf(true) }
 
+    val content = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +48,7 @@ fun SettingsScreen(
     ) {
         Spacer(modifier = Modifier.statusBarsPadding().height(16.dp))
 
-        //1. Название экрана
+        //1. НАЗВАНИЕ ЭКРАНА
         Column(
             modifier = Modifier.wrapContentSize(align = Alignment.CenterStart).padding(horizontal = 10.dp)
         ) {
@@ -64,12 +71,32 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        CategoryChip(Icons.Default.Build, Color(0xFFE57373), "Еда")
-                        CategoryChip(Icons.Default.Build, Color(0xFF64B5F6), "Путешествия")
-                        CategoryChip(Icons.Default.Build, Color(0xFFFFD54F), "Коммунальные")
-                        CategoryChip(Icons.Default.ShoppingCart, Color(0xFFBA68C8), "Продукты")
-                        CategoryChip(Icons.Default.Build, Color(0xFF81C784), "Работа")
-                        CategoryChip(Icons.Default.Add, Color.Gray, "Новая", isOutlined = true)
+                        val categories = viewModel.categories.collectAsState()
+                        categories.value
+                        for (categoryEntity in categories.value){
+                                CategoryChip(
+                                    icon = converseNameIconToIcon(categoryEntity.icon),
+                                    color = Color(categoryEntity.color),
+                                    label = categoryEntity.name,
+                                )
+                        }
+
+                        AddCategoryChip(
+                            modifier = Modifier
+                                .clickable{
+                                    // На всякий для отладки
+                                    // Toast.makeText(content,"Click", Toast.LENGTH_SHORT).show()
+                                    viewModel.createNewCategory(
+                                        name = "ДА",
+                                        color = Color.LightGray,
+                                        icon = Icons.Outlined.Build
+                                    )
+                                },
+                            Icons.Default.Add,
+                            Color.Gray,
+                            label = "Создать",
+                            isOutlined = true
+                        )
                     }
 
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
