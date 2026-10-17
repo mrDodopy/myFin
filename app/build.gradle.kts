@@ -59,6 +59,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // Расширенная библиотека иконок от compose
+    implementation("androidx.compose.material:material-icons-extended")
+
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.preference.ktx)

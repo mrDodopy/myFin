@@ -8,7 +8,7 @@ class CategoryRepository(
     private val categoryDao: CategoryDao
 ) {
 
-    val categories: Flow<List<CategoryEntity>> =
+    val categoriesFlow: Flow<List<CategoryEntity>> =
         categoryDao.getAllCategories()
 
     suspend fun addCategory(

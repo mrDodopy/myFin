@@ -1,6 +1,5 @@
 package com.example.myfin.navigation.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,7 +23,8 @@ import com.example.myfin.data.MainViewModel
 import com.example.myfin.navigation.screens.components.GlassCard
 import com.example.myfin.navigation.screens.components.forSettingsScreen.*
 import com.example.myfin.utils.LocalDialogController
-import com.example.myfin.utils.converseNameIconToIcon
+import com.example.myfin.utils.converseIconToString
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -75,7 +76,7 @@ fun SettingsScreen(
                         categories.value
                         for (categoryEntity in categories.value){
                                 CategoryChip(
-                                    icon = converseNameIconToIcon(categoryEntity.icon),
+                                    icon = converseIconToString(categoryEntity.icon),
                                     color = Color(categoryEntity.color),
                                     label = categoryEntity.name,
                                 )
@@ -102,7 +103,7 @@ fun SettingsScreen(
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
 
                     SettingsActionRow(
-                        icon = Icons.Default.Edit,
+                        icon = Icons.Default.ModeEdit,
                         iconBg = Color(0xFF5E5CE6).copy(alpha = 0.2f),
                         iconTint = Color(0xFF5E5CE6),
                         title = "Управление категориями",
@@ -134,17 +135,33 @@ fun SettingsScreen(
             SectionTitle("СЧЕТА")
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
-                    AccountRow(Icons.Default.Build, Color(0xFF4CAF50), "Наличные", "₽ 15 200")
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
-                    AccountRow(
-                        Icons.Default.Build,
-                        Color(0xFF1976D2),
-                        "Сбербанк •••• 4821",
-                        "₽ 189 300"
-                    )
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
-                    AccountRow(Icons.Default.Build, Color(0xFFFFB300), "Копилка", "₽ 80 000")
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
+                    val accountsList = viewModel.accounts.collectAsState().value
+                    for(account in  accountsList){
+                        AccountRow(
+                            icon = converseIconToString(account.icon),
+                            color = Color(account.color),
+                            funds = account.funds,
+                            name = account.name,
+                            currency = account.currency,
+                            action2Button = {
+                                viewModel.deleteAccount(account)
+                            }
+                            )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
+
+                    }
+
+//                    AccountRow(Icons.Default.Build, Color(0xFF4CAF50), "Наличные", "₽ 15 200")
+//                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
+//                    AccountRow(
+//                        Icons.Default.Build,
+//                        Color(0xFF1976D2),
+//                        "Сбербанк •••• 4821",
+//                        "₽ 189 300"
+//                    )
+//                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
+//                    AccountRow(Icons.Default.Build, Color(0xFFFFB300), "Копилка", "₽ 80 000")
+//                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
 
                     SettingsActionRow(
                         icon = Icons.Default.Add,
@@ -152,7 +169,16 @@ fun SettingsScreen(
                         iconTint = Color(0xFF4CAF50),
                         title = "Добавить счёт",
                         subtitle = "Новый счёт, карта или копилка",
-                        onClick = { /* TODO */ }
+                        onClick = {
+                            viewModel.createNewAccount(
+                                name = "Сбер",
+                                funds = 15_000f,
+                                currency = "Br",
+                                color = Color.Cyan.toArgb(),
+                                icon = Icons.Default.AdfScanner
+                            )
+
+                        }
                     )
                 }
             }

@@ -1,5 +1,6 @@
 package com.example.myfin.navigation.screens.components.forSettingsScreen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,9 +21,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myfin.utils.formatFunds
 
 @Composable
-fun AccountRow(icon: ImageVector, color: Color, name: String, balance: String) {
+fun AccountRow(
+    icon: ImageVector,
+    color: Color,
+    name: String,
+    currency: String,
+    action1Button: () -> Unit = {},
+    action2Button: () -> Unit = {},
+    funds: Float
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -33,20 +43,33 @@ fun AccountRow(icon: ImageVector, color: Color, name: String, balance: String) {
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            Text(balance, color = Color.Gray, fontSize = 14.sp)
+            Row(
+            ) {
+                Text(formatFunds(funds), color = Color.Gray, fontSize = 14.sp)
+                Text(currency, color = Color.Gray, fontSize = 14.sp)
+            }
+
         }
         Icon(
             Icons.Default.Build,
             contentDescription = "Показать/Скрыть",
             tint = Color.Gray,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier
+                .size(20.dp)
+                .clickable{
+                    action1Button()
+                }
         )
         Spacer(modifier = Modifier.width(12.dp))
         Icon(
             Icons.Default.MoreVert,
             contentDescription = "Меню",
             tint = Color.Gray,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier
+                .size(20.dp)
+                .clickable{
+                    action2Button()
+                }
         )
     }
 }

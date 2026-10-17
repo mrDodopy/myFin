@@ -5,11 +5,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myfin.data.entity.AccountEntity
 import com.example.myfin.data.repositoryes.AccountRepository
 import com.example.myfin.data.repositoryes.UserPreferencesRepository.PreferencesKeys
 import com.example.myfin.data.repositoryes.CategoryRepository
 import com.example.myfin.data.repositoryes.UserPreferencesRepository
-import com.example.myfin.utils.converseIconToIconName
+import com.example.myfin.utils.converseIconToString
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -29,7 +30,14 @@ class MainViewModel(
             )
         )
 
-    val categories = categoryRepository.categories
+    val categories = categoryRepository.categoriesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val accounts = accountRepository.accountsFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -60,9 +68,34 @@ class MainViewModel(
             categoryRepository.addCategory(
                 name = name,
                 color = color.toArgb(),
-                icon = converseIconToIconName(icon)
+                icon = converseIconToString(icon)
             )
         }
     }
 
+    fun createNewAccount(
+         name: String,
+         funds: Float,
+         currency: String,
+         color: Int,
+         icon: ImageVector
+    ){
+        viewModelScope.launch {
+            accountRepository.addAccount(
+                name = name,
+                funds = funds,
+                currency = currency,
+                color = color,
+                icon = converseIconToString(icon)
+            )
+        }
+    }
+
+    fun deleteAccount(
+        account: AccountEntity
+    ){
+        viewModelScope.launch {
+            accountRepository.deleteAccount(account = account)
+        }
+    }
 }

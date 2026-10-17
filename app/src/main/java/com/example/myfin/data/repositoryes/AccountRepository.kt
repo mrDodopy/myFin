@@ -8,7 +8,7 @@ class AccountRepository(
     private val accountDao: AccountDao
 ) {
 
-    val accounts: Flow<List<AccountEntity>> =
+    val accountsFlow: Flow<List<AccountEntity>> =
         accountDao.getAllAccounts()
 
     suspend fun addAccount(
