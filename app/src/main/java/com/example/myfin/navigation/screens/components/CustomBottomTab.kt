@@ -2,7 +2,6 @@ package com.example.myfin.navigation.screens.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -17,7 +17,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -43,9 +42,8 @@ fun RowScope.CustomBottomTab(
     val pressProgressProvider = LocalBottomTabPressProgress.current
     val onTabClick = LocalOnTabClick.current
 
-    val isLightTheme = !isSystemInDarkTheme()
-    val accentColor = if (isLightTheme) Color(0xFF0088FF) else Color(0xFF5E5CE6)
-    val textIconColor = if (isLightTheme) Color.Black.copy(0.6f) else Color.White.copy(0.6f)
+    val accentColor = MaterialTheme.colorScheme.primary
+    val textIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
     val currentColor = if (isColoredLayer) accentColor else textIconColor
 
     Column(

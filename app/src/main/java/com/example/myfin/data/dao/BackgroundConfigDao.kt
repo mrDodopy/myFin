@@ -3,6 +3,7 @@ package com.example.myfin.data.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.myfin.data.entity.BackgroundConfigEntity
@@ -11,10 +12,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BackgroundConfigDao {
 
-    @Query("SELECT * FROM background_config ORDER BY id ASC")
-    fun getAllBackgroundConfig(): Flow<List<BackgroundConfigEntity>>
+    @Query("SELECT * FROM background_config WHERE id = 1 LIMIT 1")
+    fun getBackgroundConfig(): Flow<BackgroundConfigEntity?>
 
-    @Insert
+    @Query("SELECT * FROM background_config WHERE id = 1 LIMIT 1")
+    suspend fun getBackgroundConfigOnce(): BackgroundConfigEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBackgroundConfig(backgroundConfig: BackgroundConfigEntity): Long
 
     @Update
@@ -25,5 +29,4 @@ interface BackgroundConfigDao {
 
     @Query("DELETE FROM background_config")
     suspend fun deleteAllBackgroundConfig()
-
 }

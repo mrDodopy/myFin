@@ -15,16 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.example.myfin.data.entity.BackgroundConfigEntity
 
-/**
- * Градиент заднего фона
-  */
+/** Анимированный градиентный фон, полностью управляемый BackgroundConfigEntity. */
 @Composable
 fun LiveBackground(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    config: BackgroundConfigEntity = BackgroundConfigEntity()
 ) {
-    val infiniteTransition =
-        rememberInfiniteTransition(label = "liquid_background")
+    val infiniteTransition = rememberInfiniteTransition(label = "liquid_background")
 
     val purpleX by infiniteTransition.animateFloat(
         initialValue = -300f,
@@ -35,7 +34,6 @@ fun LiveBackground(
         ),
         label = "purple_x"
     )
-
     val purpleY by infiniteTransition.animateFloat(
         initialValue = 300f,
         targetValue = 1500f,
@@ -45,7 +43,6 @@ fun LiveBackground(
         ),
         label = "purple_y"
     )
-
     val blueX by infiniteTransition.animateFloat(
         initialValue = 1500f,
         targetValue = -400f,
@@ -55,7 +52,6 @@ fun LiveBackground(
         ),
         label = "blue_x"
     )
-
     val blueY by infiniteTransition.animateFloat(
         initialValue = -300f,
         targetValue = 1700f,
@@ -65,7 +61,6 @@ fun LiveBackground(
         ),
         label = "blue_y"
     )
-
     val warmX by infiniteTransition.animateFloat(
         initialValue = 1000f,
         targetValue = -500f,
@@ -75,7 +70,6 @@ fun LiveBackground(
         ),
         label = "warm_x"
     )
-
     val warmY by infiniteTransition.animateFloat(
         initialValue = 1600f,
         targetValue = 200f,
@@ -88,17 +82,17 @@ fun LiveBackground(
 
     Box(
         modifier = modifier
-            .background(Color(0xFF050507))
+            .fillMaxSize()
+            .background(Color(config.backgroundColor))
     ) {
-
-        // Фиолетовое облако
+        // Основное свечение
         Box(
             Modifier
                 .fillMaxSize()
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            Color(0xFF6B3FA0).copy(alpha = 0.63f),
+                            Color(config.mainBackgroundColor).copy(alpha = config.mainBackgroundAlpha),
                             Color.Transparent
                         ),
                         center = Offset(purpleX, purpleY),
@@ -107,14 +101,14 @@ fun LiveBackground(
                 )
         )
 
-        // Синее облако
+        // Вторичное свечение
         Box(
             Modifier
                 .fillMaxSize()
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            Color(0xFF316DA0).copy(alpha = 0.54f),
+                            Color(config.secondaryBackgroundColor).copy(alpha = config.secondaryBackgroundAlpha),
                             Color.Transparent
                         ),
                         center = Offset(blueX, blueY),
@@ -123,14 +117,14 @@ fun LiveBackground(
                 )
         )
 
-        // Тёплое пятно
+        // Третье свечение
         Box(
             Modifier
                 .fillMaxSize()
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            Color(0xFF82464C).copy(alpha = 0.36f),
+                            Color(config.thirdBackgroundColor).copy(alpha = config.thirdBackgroundAlpha),
                             Color.Transparent
                         ),
                         center = Offset(warmX, warmY),

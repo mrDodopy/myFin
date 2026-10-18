@@ -1,18 +1,20 @@
 package com.example.myfin.data
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myfin.data.entity.AccountEntity
+import com.example.myfin.data.entity.BackgroundConfigEntity
 import com.example.myfin.data.repositoryes.AccountRepository
 import com.example.myfin.data.repositoryes.BackgroundRepository
-import com.example.myfin.data.repositoryes.UserPreferencesRepository.PreferencesKeys
 import com.example.myfin.data.repositoryes.CategoryRepository
 import com.example.myfin.data.repositoryes.UserPreferencesRepository
+import com.example.myfin.data.repositoryes.UserPreferencesRepository.PreferencesKeys
 import com.example.myfin.utils.converseIconToString
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -23,6 +25,14 @@ class MainViewModel(
     private val backgroundRepository: BackgroundRepository
 ) : ViewModel() {
 
+    private val backgroundConfigUpdateMutex = Mutex()
+
+    init {
+        viewModelScope.launch {
+            backgroundRepository.ensureDefaultConfig()
+        }
+    }
+
     val userSettings = userPreferencesRepository.userSettingsFlow
         .stateIn(
             scope = viewModelScope,
@@ -31,7 +41,7 @@ class MainViewModel(
                 themeMode = "system",
                 autoConverse = false,
                 turnedOnPassword = false,
-                turnedOnBiometry = false,
+                turnedOnBiometry = false
             )
         )
 
@@ -50,12 +60,21 @@ class MainViewModel(
         )
 
     /**
-     * Установка режима темы:
+     * Текущая конфигурация внешнего вида приложения.
      *
-     * "light"  — светлая
-     * "dark"   — тёмная
-     * "system" — системная
+     * В ней находятся:
+     * - цвета LiveBackground
+     * - primaryColor — основной цвет приложения
+     * - mainContainerColor — цвет контейнеров
+     * - textColor — основной цвет текста
      */
+    val backgroundConfig = backgroundRepository.backgroundConfigFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = BackgroundConfigEntity()
+        )
+
     fun setThemeMode(mode: String) {
         viewModelScope.launch {
             userPreferencesRepository.update { preferences ->
@@ -64,7 +83,7 @@ class MainViewModel(
         }
     }
 
-    fun setAutoConverse(enabled: Boolean){
+    fun setAutoConverse(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.update { preferences ->
                 preferences[PreferencesKeys.AUTO_CONVERSE] = enabled
@@ -72,7 +91,7 @@ class MainViewModel(
         }
     }
 
-    fun setTurnedOnPassword(enabled: Boolean){
+    fun setTurnedOnPassword(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.update { preferences ->
                 preferences[PreferencesKeys.TURNED_ON_PASSWORD] = enabled
@@ -80,7 +99,7 @@ class MainViewModel(
         }
     }
 
-    fun setTurnedOnBiometry(enabled: Boolean){
+    fun setTurnedOnBiometry(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.update { preferences ->
                 preferences[PreferencesKeys.TURNED_ON_BIOMETRY] = enabled
@@ -92,7 +111,7 @@ class MainViewModel(
         name: String,
         color: Color,
         icon: ImageVector
-        ){
+    ) {
         viewModelScope.launch {
             categoryRepository.addCategory(
                 name = name,
@@ -103,12 +122,12 @@ class MainViewModel(
     }
 
     fun createNewAccount(
-         name: String,
-         funds: Float,
-         currency: String,
-         color: Int,
-         icon: ImageVector
-    ){
+        name: String,
+        funds: Float,
+        currency: String,
+        color: Int,
+        icon: ImageVector
+    ) {
         viewModelScope.launch {
             accountRepository.addAccount(
                 name = name,
@@ -120,70 +139,51 @@ class MainViewModel(
         }
     }
 
-    fun createNewBackgroundConfig(
-        backgroundColor: Int,
-        mainBackgroundColor: Int,
-        secondaryBackgroundColor: Int,
-        thirdBackgroundColor: Int,
-        mainBackgroundAlpha: Float,
-        secondaryBackgroundAlpha: Float,
-        thirdBackgroundAlpha: Float,
-        primaryColor: Int,
-        mainContainerColor: Int,
-        textColor: Int
-    ){
-        viewModelScope.launch {
-            backgroundRepository.addBackgroundConfig(
-                backgroundColor = backgroundColor,
-                mainBackgroundColor = mainBackgroundColor,
-                secondaryBackgroundColor = secondaryBackgroundColor,
-                thirdBackgroundColor = thirdBackgroundColor,
-                mainBackgroundAlpha = mainBackgroundAlpha,
-                secondaryBackgroundAlpha = secondaryBackgroundAlpha,
-                thirdBackgroundAlpha = thirdBackgroundAlpha,
-                primaryColor = primaryColor,
-                mainContainerColor = mainContainerColor,
-                textColor = textColor,
-            )
-        }
-    }
-
+    /** Updates one or more appearance fields without overwriting newer changes. */
     fun updateBackgroundConfig(
-        id: Int,
-        backgroundColor: Int,
-        mainBackgroundColor: Int,
-        secondaryBackgroundColor: Int,
-        thirdBackgroundColor: Int,
-        mainBackgroundAlpha: Float,
-        secondaryBackgroundAlpha: Float,
-        thirdBackgroundAlpha: Float,
-        primaryColor: Int,
-        mainContainerColor: Int,
-        textColor: Int
-    ){
+        transform: (BackgroundConfigEntity) -> BackgroundConfigEntity
+    ) {
         viewModelScope.launch {
-            backgroundRepository.updateBackgroundConfig(
-                id = id,
-                backgroundColor = backgroundColor,
-                mainBackgroundColor = mainBackgroundColor,
-                secondaryBackgroundColor = secondaryBackgroundColor,
-                thirdBackgroundColor = thirdBackgroundColor,
-                mainBackgroundAlpha = mainBackgroundAlpha,
-                secondaryBackgroundAlpha = secondaryBackgroundAlpha,
-                thirdBackgroundAlpha = thirdBackgroundAlpha,
-                primaryColor = primaryColor,
-                mainContainerColor = mainContainerColor,
-                textColor = textColor,
-            )
+            backgroundConfigUpdateMutex.lock()
+            try {
+                backgroundRepository.updateBackgroundConfig(transform)
+            } finally {
+                backgroundConfigUpdateMutex.unlock()
+            }
         }
     }
 
+    fun setBackgroundColor(color: Color) {
+        updateBackgroundConfig { it.copy(backgroundColor = color.toArgb()) }
+    }
 
-    fun deleteAccount(
-        account: AccountEntity
-    ){
+    fun setMainBackgroundColor(color: Color) {
+        updateBackgroundConfig { it.copy(mainBackgroundColor = color.toArgb()) }
+    }
+
+    fun setSecondaryBackgroundColor(color: Color) {
+        updateBackgroundConfig { it.copy(secondaryBackgroundColor = color.toArgb()) }
+    }
+
+    fun setThirdBackgroundColor(color: Color) {
+        updateBackgroundConfig { it.copy(thirdBackgroundColor = color.toArgb()) }
+    }
+
+    fun setPrimaryColor(color: Color) {
+        updateBackgroundConfig { it.copy(primaryColor = color.toArgb()) }
+    }
+
+    fun setMainContainerColor(color: Color) {
+        updateBackgroundConfig { it.copy(mainContainerColor = color.toArgb()) }
+    }
+
+    fun setTextColor(color: Color) {
+        updateBackgroundConfig { it.copy(textColor = color.toArgb()) }
+    }
+
+    fun deleteAccount(account: AccountEntity) {
         viewModelScope.launch {
-            accountRepository.deleteAccount(account = account)
+            accountRepository.deleteAccount(account)
         }
     }
 }
