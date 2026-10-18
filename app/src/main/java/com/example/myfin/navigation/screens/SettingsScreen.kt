@@ -34,12 +34,7 @@ fun SettingsScreen(
     val dialogController = LocalDialogController.current
     val scrollState = rememberScrollState()
 
-    // Состояния для свитчей (в реальном приложении брать из ViewModel/DataStore)
-    var autoSyncEnabled by remember { mutableStateOf(true) }
-    var pinEnabled by remember { mutableStateOf(true) }
-    var biometricsEnabled by remember { mutableStateOf(true) }
-
-    val content = LocalContext.current
+    val userSettings = viewModel.userSettings.collectAsState().value
 
     Column(
         modifier = Modifier
@@ -138,6 +133,19 @@ fun SettingsScreen(
                     val accountsList = viewModel.accounts.collectAsState().value
                     for(account in  accountsList){
                         AccountRow(
+                            modifier = Modifier.clickable{
+                                dialogController.show {
+                                    GlassCard {
+                                        Column(modifier = Modifier.padding(24.dp)) {
+                                            Text("Детали счета", color = Color.White)
+                                            Spacer(modifier = Modifier.height(100.dp))
+                                            Button(onClick = { dialogController.hide() }) {
+                                                Text("Закрыть")
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                             icon = converseIconToString(account.icon),
                             color = Color(account.color),
                             funds = account.funds,
@@ -150,18 +158,6 @@ fun SettingsScreen(
                         HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
 
                     }
-
-//                    AccountRow(Icons.Default.Build, Color(0xFF4CAF50), "Наличные", "₽ 15 200")
-//                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
-//                    AccountRow(
-//                        Icons.Default.Build,
-//                        Color(0xFF1976D2),
-//                        "Сбербанк •••• 4821",
-//                        "₽ 189 300"
-//                    )
-//                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
-//                    AccountRow(Icons.Default.Build, Color(0xFFFFB300), "Копилка", "₽ 80 000")
-//                    HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
 
                     SettingsActionRow(
                         icon = Icons.Default.Add,
@@ -218,8 +214,10 @@ fun SettingsScreen(
                         iconTint = Color(0xFF5E5CE6),
                         title = "Автокурс конвертации",
                         subtitle = "Обновление раз в сутки",
-                        checked = autoSyncEnabled,
-                        onCheckedChange = { autoSyncEnabled = it }
+                        checked = userSettings.autoConverse,
+                        onCheckedChange = { enabled ->
+                            viewModel.setAutoConverse(enabled)
+                        }
                     )
                 }
             }
@@ -239,18 +237,22 @@ fun SettingsScreen(
                         iconTint = Color(0xFFE57373),
                         title = "ПИН-код",
                         subtitle = "Защита при открытии",
-                        checked = pinEnabled,
-                        onCheckedChange = { pinEnabled = it }
+                        checked = userSettings.turnedOnPassword,
+                        onCheckedChange ={ enabled ->
+                            viewModel.setTurnedOnPassword(enabled)
+                        }
                     )
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsToggleRow(
-                        icon = Icons.Default.Build,
+                        icon = Icons.Default.Fingerprint,
                         iconBg = Color(0xFF64B5F6).copy(alpha = 0.2f),
                         iconTint = Color(0xFF64B5F6),
                         title = "Биометрия",
                         subtitle = "Face ID / Отпечаток пальца",
-                        checked = biometricsEnabled,
-                        onCheckedChange = { biometricsEnabled = it }
+                        checked = userSettings.turnedOnBiometry,
+                        onCheckedChange = { enabled ->
+                            viewModel.setTurnedOnBiometry(enabled)
+                        }
                     )
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsActionRow(
@@ -275,7 +277,7 @@ fun SettingsScreen(
                 Column(Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconBox(
-                            Icons.Default.Build,
+                            Icons.Default.Brush,
                             Color(0xFF5E5CE6).copy(alpha = 0.2f),
                             Color(0xFF5E5CE6)
                         )

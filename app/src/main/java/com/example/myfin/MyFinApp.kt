@@ -64,7 +64,8 @@ fun MyFinApp (appContainer: AppContainer){
         factory = MainViewModelFactory(
             userPreferencesRepository = appContainer.userPreferencesRepository,
             categoryRepository = appContainer.categoryRepository,
-            accountRepository = appContainer.accountRepository
+            accountRepository = appContainer.accountRepository,
+            backgroundRepository = appContainer.backgroundRepository
         )
     )
 

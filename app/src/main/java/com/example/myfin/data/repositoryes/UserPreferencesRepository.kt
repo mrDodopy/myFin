@@ -1,9 +1,11 @@
 package com.example.myfin.data.repositoryes
 
+import android.R
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -25,7 +27,9 @@ class UserPreferencesRepository(
 
     object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
-
+        val AUTO_CONVERSE = booleanPreferencesKey("auto_converse")
+        val TURNED_ON_PASSWORD = booleanPreferencesKey("turned_on_password")
+        val TURNED_ON_BIOMETRY = booleanPreferencesKey("turned_on_biometry")
 
         // В будущем:
         // val USER_NAME = stringPreferencesKey("user_name")
@@ -44,7 +48,10 @@ class UserPreferencesRepository(
     val userSettingsFlow: Flow<UserSettings> =
         rootPreferencesFlow.map { preferences ->
             UserSettings(
-                themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "system"
+                themeMode = preferences[PreferencesKeys.THEME_MODE] ?: "system",
+                autoConverse = preferences[PreferencesKeys.AUTO_CONVERSE] ?: false,
+                turnedOnPassword = preferences[PreferencesKeys.TURNED_ON_PASSWORD] ?: false,
+                turnedOnBiometry = preferences[PreferencesKeys.TURNED_ON_BIOMETRY] ?: false
             )
         }
 
@@ -55,6 +62,8 @@ class UserPreferencesRepository(
             }
             .distinctUntilChanged()
 
+
+
     suspend fun update(
         action: (MutablePreferences) -> Unit
     ) {
@@ -62,4 +71,6 @@ class UserPreferencesRepository(
             action(preferences)
         }
     }
+
+
 }

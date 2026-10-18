@@ -25,6 +25,7 @@ import com.example.myfin.utils.formatFunds
 
 @Composable
 fun AccountRow(
+    modifier: Modifier,
     icon: ImageVector,
     color: Color,
     name: String,
@@ -34,7 +35,7 @@ fun AccountRow(
     funds: Float
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
