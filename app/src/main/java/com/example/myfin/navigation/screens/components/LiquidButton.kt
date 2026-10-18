@@ -57,7 +57,7 @@ fun LiquidButton(
                 shape = { RoundedCornerShape(50) },
                 effects = {
                     vibrancy()
-                    blur(2f.dp.toPx())
+                    blur(4f.dp.toPx())
                     lens(12f.dp.toPx(), 24f.dp.toPx())
                 },
                 layerBlock = if (isInteractive) {

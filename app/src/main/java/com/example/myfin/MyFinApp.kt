@@ -1,5 +1,6 @@
 package com.example.myfin
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
@@ -102,6 +103,12 @@ fun MyFinApp(appContainer: AppContainer) {
             )
 
             CompositionLocalProvider(LocalDialogController provides dialogController) {
+                // Нажатие системной кнопки «Назад» закрывает только диалог.
+                // Событие не передаётся Activity, поэтому приложение остаётся открытым.
+                BackHandler(enabled = dialogController.isVisible) {
+                    dialogController.hide()
+                }
+
                 Box(modifier = Modifier.fillMaxSize()) {
                     val selectedPageState = rememberPagerState(pageCount = { 4 })
 
@@ -132,7 +139,8 @@ fun MyFinApp(appContainer: AppContainer) {
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(bottom = 100.dp, end = 20.dp),
-                        visible = isFabVisible,
+                        // Полностью убираем FAB, пока открыт диалог.
+                        visible = isFabVisible && !dialogController.isVisible,
                         enter = scaleIn() + fadeIn(),
                         exit = scaleOut() + fadeOut()
                     ) {
@@ -174,21 +182,27 @@ fun MyFinApp(appContainer: AppContainer) {
                         )
                     }
 
-                    CustomBottomBar(
-                        selectedPageState = selectedPageState,
-                        tabsCount = bottomNavItems.size,
-                        backdrop = backdrop,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth(0.8f)
-                            .padding(bottom = 25.dp)
+                    AnimatedVisibility(
+                        visible = !dialogController.isVisible,
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        enter = fadeIn() + scaleIn(initialScale = 0.96f),
+                        exit = fadeOut() + scaleOut(targetScale = 0.96f)
                     ) {
-                        bottomNavItems.forEachIndexed { index, item ->
-                            CustomBottomTab(
-                                index = index,
-                                title = item.title,
-                                icon = item.icon
-                            )
+                        CustomBottomBar(
+                            selectedPageState = selectedPageState,
+                            tabsCount = bottomNavItems.size,
+                            backdrop = backdrop,
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .padding(bottom = 25.dp)
+                        ) {
+                            bottomNavItems.forEachIndexed { index, item ->
+                                CustomBottomTab(
+                                    index = index,
+                                    title = item.title,
+                                    icon = item.icon
+                                )
+                            }
                         }
                     }
 
