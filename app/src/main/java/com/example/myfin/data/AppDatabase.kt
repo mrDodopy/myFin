@@ -24,7 +24,6 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
     abstract fun accountDao(): AccountDao
-
     abstract fun backgroundConfigDao(): BackgroundConfigDao
 
     companion object {

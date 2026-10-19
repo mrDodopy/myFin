@@ -25,6 +25,9 @@ import com.example.myfin.navigation.screens.components.forSettingsScreen.*
 import com.example.myfin.utils.LocalDialogController
 import com.example.myfin.utils.converseIconToString
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.example.myfin.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -193,7 +196,7 @@ fun SettingsScreen(
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     SettingsActionRow(
-                        icon = Icons.Default.Build,
+                        icon = ImageVector.vectorResource(R.drawable.ic_belarus_ruble_new),
                         iconBg = Color(0xFFFFB300).copy(alpha = 0.2f),
                         iconTint = Color(0xFFFFB300),
                         title = "Основная валюта",
@@ -203,7 +206,7 @@ fun SettingsScreen(
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsActionRow(
-                        icon = Icons.Default.Build,
+                        icon = Icons.Default.AttachMoney,
                         iconBg = Color(0xFF1976D2).copy(alpha = 0.2f),
                         iconTint = Color(0xFF1976D2),
                         title = "Доп. валюты",
@@ -213,7 +216,7 @@ fun SettingsScreen(
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsToggleRow(
-                        icon = Icons.Default.Build,
+                        icon = Icons.Default.Sync,
                         iconBg = accentColor.copy(alpha = 0.2f),
                         iconTint = accentColor,
                         title = "Автокурс конвертации",
@@ -302,7 +305,7 @@ fun SettingsScreen(
                             .fillMaxWidth()
                             .background(
                                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                                RoundedCornerShape(8.dp)
+                                RoundedCornerShape(24.dp)
                             )
                             .padding(4.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -317,7 +320,7 @@ fun SettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .clip(RoundedCornerShape(7.dp))
+                                    .clip(RoundedCornerShape(24.dp))
                                     .background(
                                         if (selected) accentColor else Color.Transparent
                                     )

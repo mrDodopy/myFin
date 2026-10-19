@@ -1,0 +1,44 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="42"
+    android:viewportHeight="42">
+
+  <!-- Вертикальный штрих  -->
+  <path
+      android:fillColor="#000000"
+      android:pathData="M 6,0 L 28,0 L28,4 L 6,4  Z" />
+
+  <!-- Вертикальная линия -->
+  <path
+    android:fillColor="#000000"
+    android:pathData="M6,0 L10,0 L10,42 L6,42"  />
+
+  <!-- Горизонтальная черта по центру  -->
+  <path
+      android:fillColor="#000000"
+      android:pathData="M0,27 L20,27 L20,31 L0,31"  />
+
+  <!-- Верхняя часть круга Б   -->
+  <path
+      android:fillColor="#000000"
+      android:pathData="M9,17 L20,17 L20,21 L9,21"  />
+
+  <!-- Нижняя часть круга Б   -->
+  <path
+      android:fillColor="#000000"
+      android:pathData="M9,38 L20,38 L20,42 L9,42"  />
+
+  <!-- Полукруг от Б   -->
+  <path
+      android:fillColor="#000000"
+      android:pathData="M 20,17
+                        L 20,21
+                        C 24.4,21 28,24.6 28,29.5
+                        C 28,34.4 24.4,38 20,38
+                        L 20,42
+                        C 26.6,42 32,36.4 32,29.5
+                        C 32,22.6 26.6,17 20,17
+                        Z" />
+
+</vector>
