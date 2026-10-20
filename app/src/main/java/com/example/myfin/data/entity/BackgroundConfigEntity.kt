@@ -74,6 +74,5 @@ data class BackgroundConfigEntity(
     // ============================================================
 
     // Основной цвет текста приложения.
-    val textColor: Int = 0xFFFFFFFF.toInt(),
-
-    )
+    val textColor: Int = 0xFFFFFFFF.toInt()
+)

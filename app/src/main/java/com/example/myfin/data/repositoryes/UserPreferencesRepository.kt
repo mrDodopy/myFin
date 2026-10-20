@@ -1,6 +1,5 @@
 package com.example.myfin.data.repositoryes
 
-import android.R
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
@@ -63,7 +62,6 @@ class UserPreferencesRepository(
             .distinctUntilChanged()
 
 
-
     suspend fun update(
         action: (MutablePreferences) -> Unit
     ) {
@@ -71,6 +69,4 @@ class UserPreferencesRepository(
             action(preferences)
         }
     }
-
-
 }

@@ -23,7 +23,4 @@ class AppContainer(context: Context) {
     val backgroundRepository =
         BackgroundRepository(database.backgroundConfigDao())
 
-    // позже:
-    // val transactionRepository = ...
-    // val debtRepository = ...
 }
