@@ -43,8 +43,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myfin.data.MainViewModel
-import com.example.myfin.data.MainViewModelFactory
+import com.example.myfin.data.viewModelFactory.AccountViewModelFactory
+import com.example.myfin.data.viewModelFactory.BackgroundViewModelFactory
+import com.example.myfin.data.viewModelFactory.CategoryViewModelFactory
+import com.example.myfin.data.viewModelFactory.SettingsViewModelFactory
+import com.example.myfin.data.viewModels.AccountViewModel
+import com.example.myfin.data.viewModels.BackgroundViewModel
+import com.example.myfin.data.viewModels.CategoryViewModel
+import com.example.myfin.data.viewModels.SettingsViewModel
 import com.example.myfin.navigation.screens.DashBoardScreen
 import com.example.myfin.navigation.screens.DebtsScreen
 import com.example.myfin.navigation.screens.HistoryScreen
@@ -63,17 +69,34 @@ import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 
 @Composable
 fun MyFinApp(appContainer: AppContainer) {
-    val mainViewModel: MainViewModel = viewModel(
-        factory = MainViewModelFactory(
-            userPreferencesRepository = appContainer.userPreferencesRepository,
-            categoryRepository = appContainer.categoryRepository,
-            accountRepository = appContainer.accountRepository,
+
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModelFactory(
+            userPreferencesRepository = appContainer.userPreferencesRepository
+        )
+    )
+
+    val accountViewModel: AccountViewModel = viewModel(
+        factory = AccountViewModelFactory(
+            accountRepository = appContainer.accountRepository
+        )
+    )
+
+    val backgroundViewModel: BackgroundViewModel = viewModel(
+        factory = BackgroundViewModelFactory(
             backgroundRepository = appContainer.backgroundRepository
         )
     )
 
-    val userSettings by mainViewModel.userSettings.collectAsState()
-    val backgroundConfig by mainViewModel.backgroundConfig.collectAsState()
+    val categoryViewModel: CategoryViewModel = viewModel(
+        factory = CategoryViewModelFactory(
+            categoryRepository = appContainer.categoryRepository
+        )
+    )
+
+
+    val userSettings by settingsViewModel.userSettings.collectAsState()
+    val backgroundConfig by backgroundViewModel.backgroundConfig.collectAsState()
 
     val isDarkTheme = when (userSettings.themeMode) {
         "dark" -> true
@@ -126,10 +149,15 @@ fun MyFinApp(appContainer: AppContainer) {
                             modifier = Modifier.fillMaxSize()
                         ) { page ->
                             when (page) {
-                                0 -> DashBoardScreen(mainViewModel)
-                                1 -> HistoryScreen(mainViewModel)
-                                2 -> DebtsScreen(mainViewModel)
-                                3 -> SettingsScreen(mainViewModel)
+                                0 -> DashBoardScreen()
+                                1 -> HistoryScreen()
+                                2 -> DebtsScreen()
+                                3 -> SettingsScreen(
+                                    backgroundViewModel = backgroundViewModel,
+                                    settingsViewModel = settingsViewModel,
+                                    categoryViewModel = categoryViewModel,
+                                    accountViewModel = accountViewModel
+                                )
                             }
                         }
                     }

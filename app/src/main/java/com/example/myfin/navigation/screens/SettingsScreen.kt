@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myfin.data.MainViewModel
 import com.example.myfin.navigation.screens.components.GlassCard
 import com.example.myfin.navigation.screens.components.forSettingsScreen.*
 import com.example.myfin.utils.LocalDialogController
@@ -28,17 +27,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import com.example.myfin.R
+import com.example.myfin.data.viewModels.AccountViewModel
+import com.example.myfin.data.viewModels.BackgroundViewModel
+import com.example.myfin.data.viewModels.CategoryViewModel
+import com.example.myfin.data.viewModels.SettingsViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
-    viewModel: MainViewModel
+    backgroundViewModel: BackgroundViewModel,
+    settingsViewModel: SettingsViewModel,
+    categoryViewModel: CategoryViewModel,
+    accountViewModel: AccountViewModel
 ) {
     val dialogController = LocalDialogController.current
     val scrollState = rememberScrollState()
 
-    val userSettings by viewModel.userSettings.collectAsState()
-    val backgroundConfig by viewModel.backgroundConfig.collectAsState()
+    val userSettings by settingsViewModel.userSettings.collectAsState()
+    val backgroundConfig by backgroundViewModel.backgroundConfig.collectAsState()
     val accentColor = Color(backgroundConfig.primaryColor)
     val textColor = Color(backgroundConfig.textColor)
     val secondaryTextColor = textColor.copy(alpha = 0.68f)
@@ -74,7 +80,7 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val categories = viewModel.categories.collectAsState()
+                        val categories = categoryViewModel.categories.collectAsState()
                         categories.value
                         for (categoryEntity in categories.value){
                             CategoryChip(
@@ -89,7 +95,7 @@ fun SettingsScreen(
                                 .clickable{
                                     // На всякий для отладки
                                     // Toast.makeText(content,"Click", Toast.LENGTH_SHORT).show()
-                                    viewModel.createNewCategory(
+                                    categoryViewModel.createNewCategory(
                                         name = "ДА",
                                         color = Color.LightGray,
                                         icon = Icons.Outlined.Build
@@ -106,8 +112,8 @@ fun SettingsScreen(
 
                     SettingsActionRow(
                         icon = Icons.Default.ModeEdit,
-                        iconBg = accentColor.copy(alpha = 0.2f),
-                        iconTint = accentColor,
+                        iconBg = Color(0xFF5E5CE6).copy(alpha = 0.2f),
+                        iconTint =  Color(0xFF5E5CE6),
                         title = "Управление категориями",
                         subtitle = "Добавить, удалить, изменить иконки",
                         onClick = {
@@ -137,7 +143,7 @@ fun SettingsScreen(
             SectionTitle("СЧЕТА")
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
-                    val accountsList = viewModel.accounts.collectAsState().value
+                    val accountsList = accountViewModel.accounts.collectAsState().value
                     for(account in  accountsList){
                         AccountRow(
                             modifier = Modifier.clickable{
@@ -159,7 +165,7 @@ fun SettingsScreen(
                             name = account.name,
                             currency = account.currency,
                             action2Button = {
-                                viewModel.deleteAccount(account)
+                                accountViewModel.deleteAccount(account)
                             }
                         )
                         HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
@@ -173,7 +179,7 @@ fun SettingsScreen(
                         title = "Добавить счёт",
                         subtitle = "Новый счёт, карта или копилка",
                         onClick = {
-                            viewModel.createNewAccount(
+                            accountViewModel.createNewAccount(
                                 name = "Сбер",
                                 funds = 15_000f,
                                 currency = "Br",
@@ -217,13 +223,13 @@ fun SettingsScreen(
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsToggleRow(
                         icon = Icons.Default.Sync,
-                        iconBg = accentColor.copy(alpha = 0.2f),
-                        iconTint = accentColor,
+                        iconBg =  Color(0xFF5E5CE6).copy(alpha = 0.2f),
+                        iconTint =  Color(0xFF5E5CE6),
                         title = "Автокурс конвертации",
                         subtitle = "Обновление раз в сутки",
                         checked = userSettings.autoConverse,
                         onCheckedChange = { enabled ->
-                            viewModel.setAutoConverse(enabled)
+                            settingsViewModel.setAutoConverse(enabled)
                         }
                     )
                 }
@@ -246,7 +252,7 @@ fun SettingsScreen(
                         subtitle = "Защита при открытии",
                         checked = userSettings.turnedOnPassword,
                         onCheckedChange ={ enabled ->
-                            viewModel.setTurnedOnPassword(enabled)
+                            settingsViewModel.setTurnedOnPassword(enabled)
                         }
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
@@ -258,7 +264,7 @@ fun SettingsScreen(
                         subtitle = "Face ID / Отпечаток пальца",
                         checked = userSettings.turnedOnBiometry,
                         onCheckedChange = { enabled ->
-                            viewModel.setTurnedOnBiometry(enabled)
+                            settingsViewModel.setTurnedOnBiometry(enabled)
                         }
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
@@ -324,7 +330,7 @@ fun SettingsScreen(
                                     .background(
                                         if (selected) accentColor else Color.Transparent
                                     )
-                                    .clickable { viewModel.setThemeMode(mode) }
+                                    .clickable { settingsViewModel.setThemeMode(mode) }
                                     .padding(horizontal = 4.dp, vertical = 9.dp),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -364,7 +370,7 @@ fun SettingsScreen(
                             Color(0xFF20100F)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setBackgroundColor
+                        onColorSelected = backgroundViewModel::setBackgroundColor
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -379,7 +385,7 @@ fun SettingsScreen(
                             Color(0xFF9C27B0)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setMainBackgroundColor
+                        onColorSelected = backgroundViewModel::setMainBackgroundColor
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -394,7 +400,7 @@ fun SettingsScreen(
                             Color(0xFF9575CD)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setSecondaryBackgroundColor
+                        onColorSelected = backgroundViewModel::setSecondaryBackgroundColor
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -409,7 +415,7 @@ fun SettingsScreen(
                             Color(0xFF607D8B)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setThirdBackgroundColor
+                        onColorSelected = backgroundViewModel::setThirdBackgroundColor
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -425,7 +431,7 @@ fun SettingsScreen(
                             Color(0xFF8E24AA)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setPrimaryColor
+                        onColorSelected = backgroundViewModel::setPrimaryColor
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -439,7 +445,7 @@ fun SettingsScreen(
                             Color(0x20FFFFFF)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setMainContainerColor
+                        onColorSelected = backgroundViewModel::setMainContainerColor
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -454,7 +460,7 @@ fun SettingsScreen(
                             Color(0xFFFFE0B2)
                         ),
                         accentColor = accentColor,
-                        onColorSelected = viewModel::setTextColor
+                        onColorSelected = backgroundViewModel::setTextColor
                     )
                 }
             }
