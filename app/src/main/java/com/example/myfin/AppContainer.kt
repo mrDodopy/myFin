@@ -5,6 +5,7 @@ import com.example.myfin.data.AppDatabase
 import com.example.myfin.data.repositoryes.AccountRepository
 import com.example.myfin.data.repositoryes.BackgroundRepository
 import com.example.myfin.data.repositoryes.CategoryRepository
+import com.example.myfin.data.repositoryes.OperationRepository
 import com.example.myfin.data.repositoryes.UserPreferencesRepository
 
 class AppContainer(context: Context) {
@@ -23,4 +24,6 @@ class AppContainer(context: Context) {
     val backgroundRepository =
         BackgroundRepository(database.backgroundConfigDao())
 
+    val operationRepository =
+        OperationRepository(database.operationDao())
 }

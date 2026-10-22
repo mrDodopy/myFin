@@ -7,15 +7,18 @@ import androidx.room.RoomDatabase
 import com.example.myfin.data.dao.AccountDao
 import com.example.myfin.data.dao.BackgroundConfigDao
 import com.example.myfin.data.dao.CategoryDao
+import com.example.myfin.data.dao.OperationDao
 import com.example.myfin.data.entity.AccountEntity
 import com.example.myfin.data.entity.BackgroundConfigEntity
 import com.example.myfin.data.entity.CategoryEntity
+import com.example.myfin.data.entity.OperationEntity
 
 @Database(
     entities = [
         CategoryEntity::class,
         AccountEntity::class,
-        BackgroundConfigEntity::class
+        BackgroundConfigEntity::class,
+        OperationEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -25,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun accountDao(): AccountDao
     abstract fun backgroundConfigDao(): BackgroundConfigDao
+    abstract fun operationDao(): OperationDao
 
     companion object {
 

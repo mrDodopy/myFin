@@ -29,6 +29,14 @@ class AccountRepository(
         )
     }
 
+    suspend fun addAccount(
+        account: AccountEntity
+    ){
+        accountDao.insertAccount(
+            account
+        )
+    }
+
     suspend fun updateAccount(
         account: AccountEntity
     ){

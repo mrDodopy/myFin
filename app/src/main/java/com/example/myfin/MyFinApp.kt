@@ -46,10 +46,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myfin.data.viewModelFactory.AccountViewModelFactory
 import com.example.myfin.data.viewModelFactory.BackgroundViewModelFactory
 import com.example.myfin.data.viewModelFactory.CategoryViewModelFactory
+import com.example.myfin.data.viewModelFactory.OperationViewModelFactory
 import com.example.myfin.data.viewModelFactory.SettingsViewModelFactory
 import com.example.myfin.data.viewModels.AccountViewModel
 import com.example.myfin.data.viewModels.BackgroundViewModel
 import com.example.myfin.data.viewModels.CategoryViewModel
+import com.example.myfin.data.viewModels.OperationViewModel
 import com.example.myfin.data.viewModels.SettingsViewModel
 import com.example.myfin.navigation.screens.DashBoardScreen
 import com.example.myfin.navigation.screens.DebtsScreen
@@ -91,6 +93,12 @@ fun MyFinApp(appContainer: AppContainer) {
     val categoryViewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(
             categoryRepository = appContainer.categoryRepository
+        )
+    )
+
+    val operationViewModel: OperationViewModel = viewModel(
+        factory = OperationViewModelFactory(
+            operationRepository = appContainer.operationRepository
         )
     )
 
@@ -149,8 +157,13 @@ fun MyFinApp(appContainer: AppContainer) {
                             modifier = Modifier.fillMaxSize()
                         ) { page ->
                             when (page) {
-                                0 -> DashBoardScreen()
-                                1 -> HistoryScreen()
+                                0 -> DashBoardScreen(
+                                    accountViewModel = accountViewModel,
+                                    operationViewModel = operationViewModel
+                                )
+                                1 -> HistoryScreen(
+                                    operationViewModel = operationViewModel
+                                )
                                 2 -> DebtsScreen()
                                 3 -> SettingsScreen(
                                     backgroundViewModel = backgroundViewModel,
