@@ -32,7 +32,7 @@ fun AccountRow(
     currency: String,
     action1Button: () -> Unit = {},
     action2Button: () -> Unit = {},
-    funds: Float
+    funds: Long
 ) {
     Row(
         modifier = modifier

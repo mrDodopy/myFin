@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.myfin.data.dao.AccountDao
 import com.example.myfin.data.dao.BackgroundConfigDao
 import com.example.myfin.data.dao.CategoryDao
@@ -12,6 +13,7 @@ import com.example.myfin.data.entity.AccountEntity
 import com.example.myfin.data.entity.BackgroundConfigEntity
 import com.example.myfin.data.entity.CategoryEntity
 import com.example.myfin.data.entity.OperationEntity
+import com.example.myfin.utils.LocalDateTimeConverter
 
 @Database(
     entities = [
@@ -23,6 +25,7 @@ import com.example.myfin.data.entity.OperationEntity
     version = 1,
     exportSchema = false
 )
+@TypeConverters(LocalDateTimeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao

@@ -9,9 +9,9 @@ data class AccountEntity(
     val id: Long = 0,
 
     val name: String,
-    // средства на банковском счете
-    val funds: Float,
-    // валюта пока храниться в формате строки
+    // Средства на банковском счете. Храниться в копейках
+    val funds: Long,
+    // Валюта пока храниться в формате строки
     val currency: String,
 
     /**

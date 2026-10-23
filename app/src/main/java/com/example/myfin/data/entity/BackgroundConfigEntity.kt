@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class BackgroundConfigEntity(
 
     @PrimaryKey
-    val id: Int = 1,
+    val id: Long = 1,
 
     // ============================================================
     // ОСНОВНОЙ ФОН

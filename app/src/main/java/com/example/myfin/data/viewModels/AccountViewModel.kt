@@ -23,7 +23,7 @@ class AccountViewModel(
 
     fun createNewAccount(
         name: String,
-        funds: Float,
+        funds: Long,
         currency: String,
         color: Int,
         icon: ImageVector

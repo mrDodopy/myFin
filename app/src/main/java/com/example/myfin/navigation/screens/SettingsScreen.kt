@@ -3,6 +3,7 @@ package com.example.myfin.navigation.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -138,7 +139,9 @@ fun SettingsScreen(
 
         // 3. СЧЕТА
         Column(
-            modifier = Modifier.wrapContentSize(align = Alignment.CenterStart).padding(horizontal = 10.dp)
+            modifier = Modifier
+                .wrapContentSize(align = Alignment.CenterStart)
+                .padding(horizontal = 10.dp)
         ) {
             SectionTitle("СЧЕТА")
             GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -181,7 +184,7 @@ fun SettingsScreen(
                         onClick = {
                             accountViewModel.createNewAccount(
                                 name = "Сбер",
-                                funds = 15_000f,
+                                funds = 15_000__00,
                                 currency = "Br",
                                 color = Color.Cyan.toArgb(),
                                 icon = Icons.Default.AdfScanner
@@ -196,7 +199,9 @@ fun SettingsScreen(
 
         // 4. ВАЛЮТЫ
         Column(
-            modifier = Modifier.wrapContentSize(align = Alignment.CenterStart).padding(horizontal = 10.dp)
+            modifier = Modifier
+                .wrapContentSize(align = Alignment.CenterStart)
+                .padding(horizontal = 10.dp)
         ) {
             SectionTitle("ВАЛЮТЫ")
             GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -207,7 +212,18 @@ fun SettingsScreen(
                         iconTint = Color(0xFFFFB300),
                         title = "Основная валюта",
                         subtitle = "Отображение всех сумм",
-                        endContent = { Text("RUB ₽", color = secondaryTextColor, fontSize = 14.sp) },
+                        endContent = {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Text("BYN ", color = secondaryTextColor, fontSize = 14.sp)
+                                Icon(imageVector = ImageVector.vectorResource( R.drawable.ic_belarus_ruble_new),
+                                    contentDescription = null,
+                                    tint = secondaryTextColor,
+                                    modifier = Modifier.size(14.dp))
+                            }
+                                     },
                         onClick = { /* TODO */ }
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)

@@ -13,7 +13,7 @@ class AccountRepository(
 
     suspend fun addAccount(
          name: String,
-         funds: Float,
+         funds: Long,
          currency: String,
          color: Int,
          icon: String

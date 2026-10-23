@@ -4,13 +4,16 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-fun formatFunds(amount: Float): String {
+fun formatFunds(amountInCents: Long): String {
     val symbols = DecimalFormatSymbols(Locale.US).apply {
         groupingSeparator = ' ' // Разделитель тысяч — пробел
     }
 
-    // #,##0 — разделять тысячи; .## — выводить до 2 знаков копеек, если они есть
-    val formatter = DecimalFormat("#,##0.##", symbols)
+    // Гарантируем ровно 2 знака после запятой
+    val formatter = DecimalFormat("#,##0.00", symbols)
 
-    return "${formatter.format(amount)} "
+    // Переводим копейки в рубли (делим на 100.0, чтобы получить Double для форматирования)
+    val amountInRubles = amountInCents / 100.0
+
+    return formatter.format(amountInRubles)
 }
