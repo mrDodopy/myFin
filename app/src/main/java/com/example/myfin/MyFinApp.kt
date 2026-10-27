@@ -252,6 +252,7 @@ fun MyFinApp(appContainer: AppContainer) {
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
+                        // Полноэкранная затемняющая подложка: клик по ней закрывает диалог
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -262,26 +263,37 @@ fun MyFinApp(appContainer: AppContainer) {
                                 ) {},
                             contentAlignment = Alignment.Center
                         ) {
-                            Box(
-                                modifier = Modifier.animateEnterExit(
-                                    enter = scaleIn(initialScale = 0.8f),
-                                    exit = scaleOut(targetScale = 0.8f)
-                                )
-                            ) {
+                            // Контент диалога: с отступом от краёв и опущенным
+                            // вниз — сверху 2/3 свободного места, снизу 1/3
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                Spacer(modifier = Modifier.weight(2f))
                                 Box(
-                                    modifier = Modifier.clickable(
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null,
-                                        onClick = {}
-                                    )
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp)
+                                        .clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null,
+                                            onClick = {}
+                                        ),
+                                    contentAlignment = Alignment.BottomCenter
                                 ) {
-                                    dialogController.dialogContent?.invoke()
+                                    Box(
+                                        modifier = Modifier.animateEnterExit(
+                                            enter = scaleIn(initialScale = 0.85f),
+                                            exit = scaleOut(targetScale = 0.85f)
+                                        )
+                                    ) {
+                                        dialogController.dialogContent?.invoke()
+                                    }
                                 }
+                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-}
+                    } // root Box
+                } // CompositionLocalProvider
+            } // MaterialTheme
+        } // MyFinTheme
+    } // MyFinApp
+

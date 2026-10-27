@@ -2,11 +2,10 @@ package com.example.myfin.data.viewModels
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myfin.data.entity.CategoryEntity
 import com.example.myfin.data.repositoryes.CategoryRepository
-import com.example.myfin.utils.converseIconToString
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,17 +21,33 @@ class CategoryViewModel(
             initialValue = emptyList()
         )
 
+    /**
+     * Новая категория. Иконка приходит как ключ из реестра [AppIcons] — так UI
+     * создаёт категорию без зависимости от compose-иконок.
+     */
     fun createNewCategory(
         name: String,
         color: Color,
-        icon: ImageVector
+        iconKey: String
     ) {
         viewModelScope.launch {
             categoryRepository.addCategory(
                 name = name,
                 color = color.toArgb(),
-                icon = converseIconToString(icon)
+                icon = iconKey
             )
+        }
+    }
+
+    fun updateCategory(category: CategoryEntity) {
+        viewModelScope.launch {
+            categoryRepository.updateCategory(category)
+        }
+    }
+
+    fun deleteCategory(category: CategoryEntity) {
+        viewModelScope.launch {
+            categoryRepository.deleteCategory(category)
         }
     }
 }

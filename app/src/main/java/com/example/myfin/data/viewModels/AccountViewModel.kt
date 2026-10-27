@@ -1,12 +1,9 @@
 package com.example.myfin.data.viewModels
 
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myfin.data.entity.AccountEntity
 import com.example.myfin.data.repositoryes.AccountRepository
-import com.example.myfin.utils.converseIconToString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -23,21 +20,50 @@ class AccountViewModel(
             initialValue = emptyList()
         )
 
+    // Видимые счета — дашборд скрытые не учитывает
+    val visibleAccounts = accountRepository.visibleAccountsFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    /**
+     * Глазик у счёта: скрыть/показать счёт в общих списках.
+     */
+    fun toggleAccountVisibility(account: AccountEntity) {
+        viewModelScope.launch {
+            accountRepository.updateAccount(account.copy(isHidden = !account.isHidden))
+        }
+    }
+
+    /**
+     * Новый счёт. Иконка приходит как ключ из реестра [AppIcons] — так UI
+     * создаёт счёт без зависимости от compose-иконок.
+     */
     fun createNewAccount(
         name: String,
         funds: Long,
         currency: String,
         color: Int,
-        icon: ImageVector
+        icon: String
     ) {
         viewModelScope.launch {
             accountRepository.addAccount(
-                name = name,
-                funds = funds,
-                currency = currency,
-                color = color,
-                icon = converseIconToString(icon)
+               AccountEntity(
+                    name = name,
+                    funds = funds,
+                    currency = currency,
+                    color = color,
+                    icon = icon
+                )
             )
+        }
+    }
+
+    fun updateAccount(account: AccountEntity) {
+        viewModelScope.launch {
+            accountRepository.updateAccount(account)
         }
     }
 

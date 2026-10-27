@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myfin.navigation.screens.components.GlassCard
+import com.example.myfin.navigation.screens.components.forSettingsScreen.AccountEditorDialog
+import com.example.myfin.navigation.screens.components.forSettingsScreen.AdditionalCurrenciesDialog
+import com.example.myfin.navigation.screens.components.forSettingsScreen.CategoryEditorDialog
+import com.example.myfin.navigation.screens.components.forSettingsScreen.CurrencyList
+import com.example.myfin.navigation.screens.components.forSettingsScreen.CurrencyPickerDialog
 import com.example.myfin.navigation.screens.components.forSettingsScreen.*
 import com.example.myfin.utils.LocalDialogController
 import com.example.myfin.utils.converseIconToString
@@ -32,6 +36,21 @@ import com.example.myfin.data.viewModels.AccountViewModel
 import com.example.myfin.data.viewModels.BackgroundViewModel
 import com.example.myfin.data.viewModels.CategoryViewModel
 import com.example.myfin.data.viewModels.SettingsViewModel
+
+/** Активный диалог настроек: один value — один открытый диалог. */
+private sealed interface SettingsDialog {
+    data object None : SettingsDialog
+    data object ManageCategories : SettingsDialog
+    data class CategoryEditor(
+        val category: com.example.myfin.data.entity.CategoryEntity?,
+        val returnToManage: Boolean
+    ) : SettingsDialog
+    data class AccountEditor(
+        val account: com.example.myfin.data.entity.AccountEntity?
+    ) : SettingsDialog
+    data object MainCurrency : SettingsDialog
+    data object AdditionalCurrencies : SettingsDialog
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -49,6 +68,136 @@ fun SettingsScreen(
     val accentColor = Color(backgroundConfig.primaryColor)
     val textColor = Color(backgroundConfig.textColor)
     val secondaryTextColor = textColor.copy(alpha = 0.68f)
+
+    // Актуальные списки для диалогов (Room переэмитит при изменениях)
+    val categoriesForDialogs = categoryViewModel.categories.collectAsState().value
+    val accountsForDialogs = accountViewModel.accounts.collectAsState().value
+
+    // ---- Диалоги экрана ----
+    // Один «слот» активного диалога; их рендерит LaunchedEffect через dialogController.
+    var openDialog by remember { mutableStateOf<SettingsDialog>(SettingsDialog.None) }
+
+    // Ключ — только сам факт открытого диалога: данные Room переэмитит
+    // внутри контента диалога, а LaunchedEffect не сбрасывает открытое окно.
+    LaunchedEffect(openDialog) {
+        when (val dialog = openDialog) {
+            SettingsDialog.None -> dialogController.hide()
+
+            is SettingsDialog.ManageCategories -> dialogController.show {
+                // Список читается здесь же: после удаления диалог не «зависает»
+                val categories = categoryViewModel.categories.collectAsState().value
+                CategoriesManageDialog(
+                    categories = categories,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor,
+                    accentColor = accentColor,
+                    onEdit = { category ->
+                        openDialog = SettingsDialog.CategoryEditor(category = category, returnToManage = true)
+                    },
+                    onDelete = { category ->
+                        categoryViewModel.deleteCategory(category)
+                        openDialog = SettingsDialog.ManageCategories
+                    },
+                    onCreate = {
+                        openDialog = SettingsDialog.CategoryEditor(category = null, returnToManage = true)
+                    },
+                    onClose = { openDialog = SettingsDialog.None }
+                )
+            }
+
+            is SettingsDialog.CategoryEditor -> dialogController.show {
+                val customColors = userSettings.customColors.mapNotNull { it.toIntOrNull() }.map { Color(it) }
+                CategoryEditorDialog(
+                    category = dialog.category,
+                    customColors = customColors,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor,
+                    accentColor = accentColor,
+                    onSave = { name, color, iconKey ->
+                        if (dialog.category == null) {
+                            categoryViewModel.createNewCategory(
+                                name = name,
+                                color = color,
+                                iconKey = iconKey
+                            )
+                        } else {
+                            categoryViewModel.updateCategory(
+                                dialog.category.copy(name = name, color = color.toArgb(), icon = iconKey)
+                            )
+                        }
+                        openDialog = if (dialog.returnToManage) SettingsDialog.ManageCategories
+                                     else SettingsDialog.None
+                    },
+                    onDelete = dialog.category?.let { category -> ({
+                        categoryViewModel.deleteCategory(category)
+                        openDialog = SettingsDialog.ManageCategories
+                    }) },
+                    onClose = {
+                        openDialog = if (dialog.returnToManage) SettingsDialog.ManageCategories
+                                     else SettingsDialog.None
+                    }
+                )
+            }
+
+            is SettingsDialog.AccountEditor -> dialogController.show {
+                val customColors = userSettings.customColors.mapNotNull { it.toIntOrNull() }.map { Color(it) }
+                AccountEditorDialog(
+                    account = dialog.account,
+                    customColors = customColors,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor,
+                    accentColor = accentColor,
+                    onSave = { name, color, iconKey, currency ->
+                        if (dialog.account == null) {
+                            accountViewModel.createNewAccount(
+                                name = name,
+                                funds = 0L,
+                                currency = currency,
+                                color = color.toArgb(),
+                                icon = iconKey
+                            )
+                        } else {
+                            accountViewModel.updateAccount(
+                                dialog.account.copy(
+                                    name = name,
+                                    currency = currency,
+                                    color = color.toArgb(),
+                                    icon = iconKey
+                                )
+                            )
+                        }
+                        openDialog = SettingsDialog.None
+                    },
+                    onClose = { openDialog = SettingsDialog.None }
+                )
+            }
+
+            is SettingsDialog.MainCurrency -> dialogController.show {
+                CurrencyPickerDialog(
+                    currencies = CurrencyList,
+                    selectedCode = userSettings.mainCurrency,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor,
+                    accentColor = accentColor,
+                    onPick = { settingsViewModel.setMainCurrency(it) },
+                    onClose = { openDialog = SettingsDialog.None }
+                )
+            }
+
+            is SettingsDialog.AdditionalCurrencies -> dialogController.show {
+                AdditionalCurrenciesDialog(
+                    currencies = CurrencyList,
+                    mainCurrency = userSettings.mainCurrency,
+                    selectedCurrencies = userSettings.additionalCurrencies,
+                    textColor = textColor,
+                    secondaryTextColor = secondaryTextColor,
+                    accentColor = accentColor,
+                    onChange = { settingsViewModel.setAdditionalCurrencies(it) },
+                    onClose = { openDialog = SettingsDialog.None }
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -93,15 +242,7 @@ fun SettingsScreen(
 
                         AddCategoryChip(
                             modifier = Modifier
-                                .clickable{
-                                    // На всякий для отладки
-                                    // Toast.makeText(content,"Click", Toast.LENGTH_SHORT).show()
-                                    categoryViewModel.createNewCategory(
-                                        name = "ДА",
-                                        color = Color.LightGray,
-                                        icon = Icons.Outlined.Build
-                                    )
-                                },
+                                .clickable { openDialog = SettingsDialog.CategoryEditor(null, false) },
                             Icons.Default.Add,
                             secondaryTextColor,
                             label = "Создать",
@@ -111,26 +252,13 @@ fun SettingsScreen(
 
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
 
-                    SettingsActionRow(
+                     SettingsActionRow(
                         icon = Icons.Default.ModeEdit,
                         iconBg = Color(0xFF5E5CE6).copy(alpha = 0.2f),
                         iconTint =  Color(0xFF5E5CE6),
                         title = "Управление категориями",
                         subtitle = "Добавить, удалить, изменить иконки",
-                        onClick = {
-                            // Пример вызова диалога из вашего кода
-                            dialogController.show {
-                                GlassCard {
-                                    Column(modifier = Modifier.padding(24.dp)) {
-                                        Text("Редактирование категорий", color = textColor)
-                                        Spacer(modifier = Modifier.height(100.dp))
-                                        Button(onClick = { dialogController.hide() }) {
-                                            Text("Закрыть")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        onClick = { openDialog = SettingsDialog.ManageCategories }
                     )
                 }
             }
@@ -150,23 +278,18 @@ fun SettingsScreen(
                     for(account in  accountsList){
                         AccountRow(
                             modifier = Modifier.clickable{
-                                dialogController.show {
-                                    GlassCard {
-                                        Column(modifier = Modifier.padding(24.dp)) {
-                                            Text("Детали счета", color = textColor)
-                                            Spacer(modifier = Modifier.height(100.dp))
-                                            Button(onClick = { dialogController.hide() }) {
-                                                Text("Закрыть", color = textColor)
-                                            }
-                                        }
-                                    }
-                                }
+                                // Редактирование счёта
+                                openDialog = SettingsDialog.AccountEditor(account)
                             },
                             icon = converseIconToString(account.icon),
                             color = Color(account.color),
                             funds = account.funds,
                             name = account.name,
                             currency = account.currency,
+                            isVisible = !account.isHidden,
+                            onToggleVisible = {
+                                accountViewModel.toggleAccountVisibility(account)
+                            },
                             action2Button = {
                                 accountViewModel.deleteAccount(account)
                             }
@@ -181,16 +304,7 @@ fun SettingsScreen(
                         iconTint = Color(0xFF4CAF50),
                         title = "Добавить счёт",
                         subtitle = "Новый счёт, карта или копилка",
-                        onClick = {
-                            accountViewModel.createNewAccount(
-                                name = "Сбер",
-                                funds = 15_000__00,
-                                currency = "Br",
-                                color = Color.Cyan.toArgb(),
-                                icon = Icons.Default.AdfScanner
-                            )
-
-                        }
+                        onClick = { openDialog = SettingsDialog.AccountEditor(null) }
                     )
                 }
             }
@@ -213,18 +327,26 @@ fun SettingsScreen(
                         title = "Основная валюта",
                         subtitle = "Отображение всех сумм",
                         endContent = {
+                            // Иконка + код основной валюты и «>»
                             Row(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ){
-                                Text("BYN ", color = secondaryTextColor, fontSize = 14.sp)
-                                Icon(imageVector = ImageVector.vectorResource( R.drawable.ic_belarus_ruble_new),
+                                CurrencyLabel(
+                                    code = userSettings.mainCurrency,
+                                    tint = secondaryTextColor,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Icon(
+                                    Icons.Default.ChevronRight,
                                     contentDescription = null,
                                     tint = secondaryTextColor,
-                                    modifier = Modifier.size(14.dp))
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
-                                     },
-                        onClick = { /* TODO */ }
+                        },
+                        onClick = { openDialog = SettingsDialog.MainCurrency }
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsActionRow(
@@ -233,8 +355,27 @@ fun SettingsScreen(
                         iconTint = Color(0xFF1976D2),
                         title = "Доп. валюты",
                         subtitle = "USD, EUR и другие",
-                        endContent = { Text("2 активно", color = secondaryTextColor, fontSize = 14.sp) },
-                        onClick = { /* TODO */ }
+                        endContent = {
+                            val count = userSettings.additionalCurrencies.size
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    if (count > 0) "$count" else "",
+                                    color = secondaryTextColor,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Icon(
+                                    Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    tint = secondaryTextColor,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        },
+                        onClick = { openDialog = SettingsDialog.AdditionalCurrencies }
                     )
                     HorizontalDivider(color = textColor.copy(alpha = 0.1f), thickness = 1.dp)
                     SettingsToggleRow(
@@ -483,4 +624,5 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(100.dp)) // Отступ под BottomBar
     }
+
 }

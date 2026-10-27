@@ -12,6 +12,10 @@ class AccountRepository(
     val accountsFlow: Flow<List<AccountEntity>> =
         accountDao.getAllAccounts()
 
+    // Видимые счета (без скрытых глазиком) — для дашборда
+    val visibleAccountsFlow: Flow<List<AccountEntity>> =
+        accountDao.getVisibleAccounts()
+
     suspend fun addAccount(
          name: String,
          funds: Long,

@@ -28,5 +28,8 @@ data class AccountEntity(
      * Здесь пока просто String.
      * Например: "food", "car", "home".
      */
-    val icon: String
+    val icon: String,
+
+    // Скрытые счёта не отображаются на дашборде (но видны в настройках)
+    val isHidden: Boolean = false
 )

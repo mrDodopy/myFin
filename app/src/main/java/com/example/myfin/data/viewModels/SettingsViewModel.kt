@@ -21,7 +21,10 @@ class SettingsViewModel(
                 themeMode = "system",
                 autoConverse = false,
                 turnedOnPassword = false,
-                turnedOnBiometry = false
+                turnedOnBiometry = false,
+                mainCurrency = "BYN",
+                additionalCurrencies = emptySet(),
+                customColors = emptySet()
             )
         )
 
@@ -54,6 +57,18 @@ class SettingsViewModel(
             userPreferencesRepository.update { preferences ->
                 preferences[UserPreferencesRepository.PreferencesKeys.TURNED_ON_BIOMETRY] = enabled
             }
+        }
+    }
+
+    fun setMainCurrency(currency: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.setMainCurrency(currency)
+        }
+    }
+
+    fun setAdditionalCurrencies(currencies: Set<String>) {
+        viewModelScope.launch {
+            userPreferencesRepository.setAdditionalCurrencies(currencies)
         }
     }
 

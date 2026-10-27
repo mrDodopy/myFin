@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.myfin.data.dao.AccountDao
 import com.example.myfin.data.dao.BackgroundConfigDao
 import com.example.myfin.data.dao.CategoryDao
@@ -35,6 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
 
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -44,9 +47,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "myfin_database"
-                ).build().also {
-                    INSTANCE = it
-                }
+                )
+                    .build().also {
+                        INSTANCE = it
+                    }
             }
         }
     }

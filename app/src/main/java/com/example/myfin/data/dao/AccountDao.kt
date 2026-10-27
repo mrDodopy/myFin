@@ -14,6 +14,10 @@ interface AccountDao{
     @Query("SELECT * FROM accounts ORDER BY id ASC")
     fun getAllAccounts(): Flow<List<AccountEntity>>
 
+    // Видимые счета — для дашборда (скрытые через глазик не учитываются)
+    @Query("SELECT * FROM accounts WHERE isHidden = 0 ORDER BY id ASC")
+    fun getVisibleAccounts(): Flow<List<AccountEntity>>
+
     @Insert
     suspend fun insertAccount(account: AccountEntity): Long
 

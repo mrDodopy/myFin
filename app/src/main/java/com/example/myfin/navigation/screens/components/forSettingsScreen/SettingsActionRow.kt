@@ -47,6 +47,5 @@ fun SettingsActionRow(
             endContent()
             Spacer(modifier = Modifier.width(8.dp))
         }
-        Icon(Icons.Default.Build, contentDescription = null, tint = Color.Gray)
     }
 }
