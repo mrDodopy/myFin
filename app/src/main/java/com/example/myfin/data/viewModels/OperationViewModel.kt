@@ -2,7 +2,6 @@ package com.example.myfin.data.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myfin.data.entity.OperationEntity
 import com.example.myfin.data.repositoryes.OperationRepository
 import kotlinx.coroutines.flow.SharingStarted

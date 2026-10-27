@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
 
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
 }
@@ -45,6 +44,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -62,15 +62,8 @@ dependencies {
     // Расширенная библиотека иконок от compose
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Hilt
-    implementation(libs.hilt.android)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.foundation)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.nav.compose)
-
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.9.3")
 
     // Liquid glass
     implementation("io.github.kyant0:backdrop:2.0.0")
@@ -80,19 +73,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
-
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-
-    // Room
-    implementation("androidx.room:room-runtime:2.8.3")
-    implementation("androidx.room:room-ktx:2.8.3")
-    ksp("androidx.room:room-compiler:2.8.3")
 }
 
 kotlin {

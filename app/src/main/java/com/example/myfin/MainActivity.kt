@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var appContainer: AppContainer
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -16,7 +14,7 @@ class MainActivity : ComponentActivity() {
          * APP CONTAINER
          * ============================================================
          *
-         * Создаётся один раз на всё Activity.
+         * Создаётся один раз на весь процесс в MyFinApplication.
          *
          * Внутри AppContainer находятся:
          * - Room database
@@ -24,9 +22,10 @@ class MainActivity : ComponentActivity() {
          * - repositories
          *
          * Нужен для того чтобы все ViewModel получали доступ к одной и той же
-         * базе данных и одним и тем же репозиториям.
+         * базе данных и одним и тем же репозиториям — даже после пересоздания
+         * Activity (поворот экрана и т.п.).
          */
-        appContainer = AppContainer(applicationContext)
+        val appContainer = (application as MyFinApplication).appContainer
 
         setContent {
             MyFinApp(appContainer)

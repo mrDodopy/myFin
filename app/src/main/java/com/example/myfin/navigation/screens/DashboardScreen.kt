@@ -22,6 +22,7 @@ fun DashBoardScreen(
     accountViewModel: AccountViewModel,
     operationViewModel: OperationViewModel
 ) {
+    val totalAccountFunds =
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,6 +32,8 @@ fun DashBoardScreen(
         horizontalAlignment = Alignment.Start
     ) {
         Spacer(modifier = Modifier.statusBarsPadding())
+
+
 
         Text("ОБЩИЙ БАЛАНС", color = Color.Gray, fontSize = 18.sp)
         Text("284 500", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Bold)
